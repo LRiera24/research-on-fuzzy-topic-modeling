@@ -4,6 +4,7 @@ from nltk.stem import PorterStemmer, WordNetLemmatizer
 from gensim import corpora, models
 from collections import defaultdict
 
+
 class LexicalPreprocessing:
     def __init__(self, documents):
         self.documents = documents
@@ -19,19 +20,23 @@ class LexicalPreprocessing:
         self.tokens = [word_tokenize(doc) for doc in self.documents]
 
     def remove_noise(self):
-        self.clean_tokens = [[word.lower() for word in doc if word.isalpha()] for doc in self.tokens]
+        self.clean_tokens = [
+            [word.lower() for word in doc if word.isalpha()] for doc in self.tokens]
 
     def remove_stopwords(self):
         stop_words = set(stopwords.words('english'))
-        self.clean_tokens = [[word for word in doc if word not in stop_words] for doc in self.clean_tokens]
+        self.clean_tokens = [
+            [word for word in doc if word not in stop_words] for doc in self.clean_tokens]
 
     def stemming_or_lemmatization(self, use_lemmatization=False):
         if use_lemmatization:
             lemmatizer = WordNetLemmatizer()
-            self.lemmatized_tokens = [[lemmatizer.lemmatize(word) for word in doc] for doc in self.clean_tokens]
+            self.lemmatized_tokens = [[lemmatizer.lemmatize(
+                word) for word in doc] for doc in self.clean_tokens]
         else:
             stemmer = PorterStemmer()
-            self.stemmed_tokens = [[stemmer.stem(word) for word in doc] for doc in self.clean_tokens]
+            self.stemmed_tokens = [
+                [stemmer.stem(word) for word in doc] for doc in self.clean_tokens]
 
     def build_vocabulary(self):
         all_tokens = self.stemmed_tokens if self.stemmed_tokens else self.lemmatized_tokens
@@ -55,13 +60,16 @@ class LexicalPreprocessing:
             self.vector_representation_bow = corpus
 
     def __repr__(self) -> str:
-        attributes = vars(self)  # Get all attributes of the class as a dictionary
-        repr_str = "\n".join(f"{key}: {value}" for key, value in attributes.items())
+        # Get all attributes of the class as a dictionary
+        attributes = vars(self)
+        repr_str = "\n".join(f"{key}: {value}" for key,
+                             value in attributes.items())
         return repr_str
 
 
 # Create a list of documents (each document is a list of words)
-documents = ["This is the first document.", "This document is the second document.", "And this is the third one.", "Is this the first document?"]
+documents = ["This is the first document.", "This document is the second document.",
+             "And this is the third one.", "Is this the first document?"]
 
 # Initialize the LexicalPreprocessing class with your documents
 preprocessor = LexicalPreprocessing(documents)
