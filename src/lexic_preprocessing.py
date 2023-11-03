@@ -4,42 +4,43 @@ from nltk.stem import PorterStemmer, WordNetLemmatizer
 from gensim import corpora, models
 from collections import defaultdict
 
-
 class LexicalPreprocessing:
-    def __init__(self, documents):
-        self.documents = documents
-        self.tokens = []
-        self.clean_tokens = []
-        self.stemmed_tokens = []
-        self.lemmatized_tokens = []
-        self.vocabulary = []
-        self.vector_representation_bow = None
-        self.vector_representation_tfidf = None
+    def __init__(self):
+        self.tokens = []  # List to store tokenized documents
+        self.morphed_tokens = []  # List to store stemmed or lemmatized tokens
+        self.vocabulary = []  # List to store the processed vocabulary
+        self.vector_repr = None  # Vector representation of the documents
 
-    def tokenization(self):
-        self.tokens = [word_tokenize(doc) for doc in self.documents]
+    def tokenization(self, documents):
+        # Tokenizes the input documents and stores them in 'self.tokens'
+        self.tokens = [word_tokenize(doc) for doc in documents]
 
     def remove_noise(self):
-        self.clean_tokens = [
+        # Removes non-alphabetic words and converts to lowercase
+        self.tokens = [
             [word.lower() for word in doc if word.isalpha()] for doc in self.tokens]
 
     def remove_stopwords(self):
+        # Removes common English stopwords
         stop_words = set(stopwords.words('english'))
-        self.clean_tokens = [
-            [word for word in doc if word not in stop_words] for doc in self.clean_tokens]
+        self.tokens = [
+            [word for word in doc if word not in stop_words] for doc in self.tokens]
 
-    def stemming_or_lemmatization(self, use_lemmatization=False):
+    def morphological_reduction(self, use_lemmatization=True):
         if use_lemmatization:
+            # Lemmatize the tokens 
             lemmatizer = WordNetLemmatizer()
-            self.lemmatized_tokens = [[lemmatizer.lemmatize(
-                word) for word in doc] for doc in self.clean_tokens]
+            self.morphed_tokens = [[lemmatizer.lemmatize(
+                word) for word in doc] for doc in self.tokens]
         else:
+            # Stem the tokens 
             stemmer = PorterStemmer()
-            self.stemmed_tokens = [
-                [stemmer.stem(word) for word in doc] for doc in self.clean_tokens]
+            self.morphed_tokens = [
+                [stemmer.stem(word) for word in doc] for doc in self.tokens]
 
     def build_vocabulary(self):
-        all_tokens = self.stemmed_tokens if self.stemmed_tokens else self.lemmatized_tokens
+        # Build the vocabulary with optional stemming or lemmatization
+        all_tokens = self.morphed_tokens
         frequency = defaultdict(int)
 
         for doc in all_tokens:
@@ -48,19 +49,20 @@ class LexicalPreprocessing:
 
         self.vocabulary = list(frequency.keys())
 
-    def vector_representation(self, use_tfidf=False):
-        if use_tfidf:
-            dictionary = corpora.Dictionary(self.stemmed_tokens)
-            corpus = [dictionary.doc2bow(doc) for doc in self.stemmed_tokens]
-            tfidf = models.TfidfModel(corpus)
-            self.vector_representation_tfidf = [tfidf[doc] for doc in corpus]
+    def vector_representation(self, use_bow=False):
+        # Generate the vector representation of the documents using Bag of Words (BoW) or TF-IDF
+        dictionary = corpora.Dictionary(self.morphed_tokens)
+        corpus = [dictionary.doc2bow(doc) for doc in self.morphed_tokens]
+        if use_bow:
+            # Using BoW representation
+            self.vector_repr = corpus
         else:
-            dictionary = corpora.Dictionary(self.stemmed_tokens)
-            corpus = [dictionary.doc2bow(doc) for doc in self.stemmed_tokens]
-            self.vector_representation_bow = corpus
+            # Using TF-IDF representation
+            tfidf = models.TfidfModel(corpus)
+            self.vector_repr = [tfidf[doc] for doc in corpus]
 
     def __repr__(self) -> str:
-        # Get all attributes of the class as a dictionary
+        # Get all attributes of the class as a dictionary and format them for printing
         attributes = vars(self)
         repr_str = "\n".join(f"{key}: {value}" for key,
                              value in attributes.items())
@@ -72,19 +74,14 @@ documents = ["This is creation the first document.", "This document is the secon
              "And this is the third one.", "Is this the first document?"]
 
 # Initialize the LexicalPreprocessing class with your documents
-preprocessor = LexicalPreprocessing(documents)
+preprocessor = LexicalPreprocessing()
 
 # Preprocess the documents
-preprocessor.tokenization()
+preprocessor.tokenization(documents)
 preprocessor.remove_noise()
 preprocessor.remove_stopwords()
-preprocessor.stemming_or_lemmatization()
+preprocessor.morphological_reduction()
 preprocessor.build_vocabulary()
-
-# Calculate Bag of Words (BoW) vector representation
-preprocessor.vector_representation(use_tfidf=False)
-
-# Calculate TF-IDF vector representation
-preprocessor.vector_representation(use_tfidf=True)
+preprocessor.vector_representation()
 
 print(preprocessor)

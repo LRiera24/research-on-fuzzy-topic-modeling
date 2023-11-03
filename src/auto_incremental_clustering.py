@@ -5,15 +5,14 @@ from statistics import mean
 import itertools
 
 # Constants for dictionary
-centroid = 0
-elements = 1
-
+CENTROID = 0
+ELEMENTS = 1
 
 class AutoIncrementalClustering:
     def __init__(self, word_embeddings, model, min_coherence=0.5):
         # Initialize the class with provided word embeddings, a model, and a minimum coherence threshold.
         self.word_embeddings = word_embeddings
-        self.max_entropy = min_coherence
+        self.min_coherence = min_coherence
         self.model = model
         self.clusters = {}
         self.pairwise_similarities = {}
@@ -30,7 +29,7 @@ class AutoIncrementalClustering:
         similarities = []
 
         for cluster_data in self.clusters.values():
-            cluster_centroid = cluster_data[centroid]
+            cluster_centroid = cluster_data[CENTROID]
             similarity = cosine_similarity(word_embedding, cluster_centroid)
             similarities.append((cluster_data, similarity))
 
@@ -46,7 +45,7 @@ class AutoIncrementalClustering:
         coherences = []
 
         for cluster_data in self.clusters.values():
-            cluster_elements = cluster_data[elements]
+            cluster_elements = cluster_data[ELEMENTS]
 
             # Calculate cosine similarities for pairwise combinations of words in the cluster.
             pairwise_sims = []
@@ -89,8 +88,8 @@ class AutoIncrementalClustering:
         else:
             for cluster_num in common_clusters:
                 # Update an existing cluster with the new word embedding.
-                updated_elements = self.clusters[cluster_num][elements].append(
+                updated_elements = self.clusters[cluster_num][ELEMENTS].append(
                     word_embedding)
                 new_centroid = mean(updated_elements)
-                self.clusters[cluster_num][centroid] = new_centroid
-                self.clusters[cluster_num][elements] = updated_elements
+                self.clusters[cluster_num][CENTROID] = new_centroid
+                self.clusters[cluster_num][ELEMENTS] = updated_elements
