@@ -68,7 +68,7 @@ class LexicalPreprocessing:
 
 
 # Create a list of documents (each document is a list of words)
-documents = ["This is the first document.", "This document is the second document.",
+documents = ["This is creation the first document.", "This document is the second document.",
              "And this is the third one.", "Is this the first document?"]
 
 # Initialize the LexicalPreprocessing class with your documents

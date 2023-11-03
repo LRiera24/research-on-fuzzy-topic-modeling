@@ -1,58 +1,96 @@
-from math import inf
-import numpy as np
-from scipy.stats import entropy
+import hashlib
+from sklearn.metrics.pairwise import cosine_similarity
 from scipy.stats import hmean
-from scipy.stats import mean
+from statistics import mean
+import itertools
 
+# Constants for dictionary
 centroid = 0
 elements = 1
 
 
-class auto_incremental_clustering:
-    def __init__(self, word_embeddings, max_entropy=0.5):
+class AutoIncrementalClustering:
+    def __init__(self, word_embeddings, model, min_coherence=0.5):
+        # Initialize the class with provided word embeddings, a model, and a minimum coherence threshold.
         self.word_embeddings = word_embeddings
-        self.max_entropy = max_entropy
+        self.max_entropy = min_coherence
+        self.model = model
         self.clusters = {}
+        self.pairwise_similarities = {}
 
     def clustering(self):
+        # Perform clustering on the provided word embeddings.
         for w_embedding in self.word_embeddings:
-            distances = self.calculate_distance(w_embedding)
-            entropies = self.evaluate_quality(w_embedding)
+            similarities = self.calculate_similarities(w_embedding)
+            coherences = self.evaluate_quality(w_embedding)
+            self.assignment(w_embedding, similarities, coherences)
 
-            self.assignment(w_embedding, distances, entropies)
+    def calculate_similarities(self, word_embedding):
+        # Calculate similarities between the word embedding and existing cluster centroids.
+        similarities = []
 
-    def calculate_distance(self, word_embedding):
-        centroids = [c for c, cluster in self.clusters.values()]
-        euclidean_distances = [np.linalg.norm(
-            word_embedding - centroid) for centroid in centroids]
+        for cluster_data in self.clusters.values():
+            cluster_centroid = cluster_data[centroid]
+            similarity = cosine_similarity(word_embedding, cluster_centroid)
+            similarities.append((cluster_data, similarity))
 
-        harmonic_mean = hmean(euclidean_distances)
-        euclidean_distances = [(index, distance) for index, distance in enumerate(
-            euclidean_distances) if distance <= harmonic_mean]
+        # Calculate harmonic mean of similarities and filter clusters based on a threshold.
+        harmonic_mean = hmean([sim for _, sim in similarities])
+        similarities = [(cluster_num, similarity) for cluster_num,
+                        similarity in similarities if similarity >= harmonic_mean]
 
-        return euclidean_distances
+        return similarities
 
-    def evaluate_quality(self, word_embeddig):
-        entropies = []
-        for i in range(self.clusters):
-            test = self.clusters[i][elements].append(word_embeddig)
-            entropies.append(entropy(test))
+    def evaluate_quality(self, word_embedding):
+        # Evaluate the quality of clusters based on word embedding coherences within the cluster.
+        coherences = []
 
-        entropies = [(index, entropy)
-                     for index, entropy in entropies if entropy <= self.max_entropy]
+        for cluster_data in self.clusters.values():
+            cluster_elements = cluster_data[elements]
 
-        return entropies
+            # Calculate cosine similarities for pairwise combinations of words in the cluster.
+            pairwise_sims = []
+            for pair in itertools.combinations(cluster_elements + [word_embedding], 2):
+                pair = sorted(pair)
+                key = hashlib.md5(f"{pair[0]}-{pair[1]}".encode()).hexdigest()
+                if key in self.pairwise_similarities:
+                    similarity = self.pairwise_similarities[key]
+                else:
+                    similarity = self.model.similarity(pair[0], pair[1])
+                    self.pairwise_similarities[key] = similarity
+                pairwise_sims.append(similarity)
 
-    def assignment(self, word_embedding, distances, entropies):
-        common_indices = set(index1 for index1, _ in distances) & set(
-            index2 for index2, _ in entropies)
-        if len(self.clusters) == 0 or len(common_indices) == 0:
+            # Calculate coherence for the cluster by averaging the pairwise similarities.
+            coherence = mean(pairwise_sims)
+            coherences.append(coherence)
+
+        # Normalize coherences between 0 and 1, and filter clusters based on a coherence threshold.
+        max_coherence = max(coherences)
+        if max_coherence > 0:
+            coherences = [coherence /
+                          max_coherence for coherence in coherences]
+        else:
+            coherences = [0.0] * len(coherences)
+
+        coherences = [(cluster_num, coherence) for cluster_num, coherence in zip(
+            self.clusters.keys(), coherences) if coherence >= self.min_coherence]
+
+        return coherences
+
+    def assignment(self, word_embedding, similarities, coherences):
+        # Assign the word embedding to an existing or new cluster based on similarities and coherences.
+        common_clusters = set(index1 for index1, _ in similarities) & set(
+            index2 for index2, _ in coherences)
+
+        if len(self.clusters) == 0 or len(common_clusters) == 0:
+            # If no clusters exist or there are no common clusters, create a new cluster.
             self.clusters[len(self.clusters)] = [
                 word_embedding, [word_embedding]]
         else:
-            for index in common_indices:
-                updated_elements = self.clusters[index][elements].append(
+            for cluster_num in common_clusters:
+                # Update an existing cluster with the new word embedding.
+                updated_elements = self.clusters[cluster_num][elements].append(
                     word_embedding)
                 new_centroid = mean(updated_elements)
-                self.clusters[index][centroid] = new_centroid
-                self.clusters[index][elements] = updated_elements
+                self.clusters[cluster_num][centroid] = new_centroid
+                self.clusters[cluster_num][elements] = updated_elements
