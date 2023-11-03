@@ -64,10 +64,10 @@ class AutoIncrementalClustering:
             coherences.append(coherence)
 
         # Normalize coherences between 0 and 1, and filter clusters based on a coherence threshold.
-        max_coherence = max(coherences)
-        if max_coherence > 0:
+        min_coherence = max(coherences)
+        if min_coherence > 0:
             coherences = [coherence /
-                          max_coherence for coherence in coherences]
+                          min_coherence for coherence in coherences]
         else:
             coherences = [0.0] * len(coherences)
 

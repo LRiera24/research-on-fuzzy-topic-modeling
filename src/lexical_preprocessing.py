@@ -83,6 +83,6 @@ preprocessor.remove_noise()
 preprocessor.remove_stopwords()
 preprocessor.morphological_reduction()
 preprocessor.build_vocabulary()
-preprocessor.vector_representation()
+preprocessor.vector_representation(True)
 
 print(preprocessor)

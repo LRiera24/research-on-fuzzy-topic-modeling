@@ -1,6 +1,7 @@
 from gensim.models import KeyedVectors
 import numpy as np
 from auto_incremental_clustering import AutoIncrementalClustering
+import os
 
 # Define constants
 ELEMENTS = 1  # Used as an index
@@ -34,3 +35,10 @@ class TopicNumberEstimation:
                 if len(clustering.clusters[cluster_num][ELEMENTS]) >= min_words_per_topic)
 
         return k
+
+model_path = os.path.abspath('src')
+model_path += '/Word2Vec/GoogleNews-vectors-negative300.bin'
+print (model_path)
+
+estimator = TopicNumberEstimation(["hello", "hola"], model_path)
+estimator.get_word_embeddings()
