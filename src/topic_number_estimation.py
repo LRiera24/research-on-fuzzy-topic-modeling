@@ -30,6 +30,7 @@ class TopicNumberEstimation:
         
         k = 0
         # Count clusters with a minimum number of words
-        k += sum(1 for cluster_num in len(clustering.clusters) if clustering.clusters[cluster_num][ELEMENTS] >= min_words_per_topic)
+        k += sum(1 for cluster_num in len(clustering.clusters) 
+                if len(clustering.clusters[cluster_num][ELEMENTS]) >= min_words_per_topic)
 
         return k

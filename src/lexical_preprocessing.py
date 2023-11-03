@@ -10,6 +10,7 @@ class LexicalPreprocessing:
         self.morphed_tokens = []  # List to store stemmed or lemmatized tokens
         self.vocabulary = []  # List to store the processed vocabulary
         self.vector_repr = None  # Vector representation of the documents
+        self.dictionary = None  # Represents a Gensim Dictionary
 
     def tokenization(self, documents):
         # Tokenizes the input documents and stores them in 'self.tokens'
@@ -51,8 +52,8 @@ class LexicalPreprocessing:
 
     def vector_representation(self, use_bow=False):
         # Generate the vector representation of the documents using Bag of Words (BoW) or TF-IDF
-        dictionary = corpora.Dictionary(self.morphed_tokens)
-        corpus = [dictionary.doc2bow(doc) for doc in self.morphed_tokens]
+        self.dictionary = corpora.Dictionary(self.morphed_tokens)
+        corpus = [self.dictionary.doc2bow(doc) for doc in self.morphed_tokens]
         if use_bow:
             # Using BoW representation
             self.vector_repr = corpus
