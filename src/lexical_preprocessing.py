@@ -4,6 +4,7 @@ from nltk.stem import PorterStemmer, WordNetLemmatizer
 from gensim import corpora, models
 from collections import defaultdict
 
+
 class LexicalPreprocessing:
     def __init__(self):
         self.tokens = []  # List to store tokenized documents
@@ -11,6 +12,14 @@ class LexicalPreprocessing:
         self.vocabulary = []  # List to store the processed vocabulary
         self.vector_repr = None  # Vector representation of the documents
         self.dictionary = None  # Represents a Gensim Dictionary
+
+    def preprocess_text(self, documents):
+        self.tokenization(documents)
+        self.remove_noise()
+        self.remove_stopwords()
+        self.morphological_reduction()
+        self.build_vocabulary()
+        self.vector_representation()
 
     def tokenization(self, documents):
         # Tokenizes the input documents and stores them in 'self.tokens'
@@ -29,12 +38,12 @@ class LexicalPreprocessing:
 
     def morphological_reduction(self, use_lemmatization=True):
         if use_lemmatization:
-            # Lemmatize the tokens 
+            # Lemmatize the tokens
             lemmatizer = WordNetLemmatizer()
             self.morphed_tokens = [[lemmatizer.lemmatize(
                 word) for word in doc] for doc in self.tokens]
         else:
-            # Stem the tokens 
+            # Stem the tokens
             stemmer = PorterStemmer()
             self.morphed_tokens = [
                 [stemmer.stem(word) for word in doc] for doc in self.tokens]
@@ -50,7 +59,10 @@ class LexicalPreprocessing:
 
         self.vocabulary = list(frequency.keys())
 
-    def vector_representation(self, use_bow=False):
+    def reduce_vocabulary(self):
+        pass
+
+    def vector_representation(self, use_bow=True):
         # Generate the vector representation of the documents using Bag of Words (BoW) or TF-IDF
         self.dictionary = corpora.Dictionary(self.morphed_tokens)
         corpus = [self.dictionary.doc2bow(doc) for doc in self.morphed_tokens]
@@ -76,13 +88,6 @@ documents = ["This is creation the first document.", "This document is the secon
 
 # Initialize the LexicalPreprocessing class with your documents
 preprocessor = LexicalPreprocessing()
-
-# Preprocess the documents
-preprocessor.tokenization(documents)
-preprocessor.remove_noise()
-preprocessor.remove_stopwords()
-preprocessor.morphological_reduction()
-preprocessor.build_vocabulary()
-preprocessor.vector_representation(True)
+preprocessor.preprocess_text(documents)
 
 print(preprocessor)
