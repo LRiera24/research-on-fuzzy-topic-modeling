@@ -1,5 +1,5 @@
-
 from gensim import models, corpora
+
 
 class TopicDiscovery:
     def __init__(self, vector_representation, dictionary, num_topics):
