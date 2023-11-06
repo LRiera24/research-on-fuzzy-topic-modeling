@@ -54,6 +54,7 @@ class TextClassificationEvaluator(Evaluator):
 
 class InformationRetrievalEvaluator(Evaluator):
     def __init__(self, ir_system_component, relevant_documents, retrieved_documents):
+        super().__init__(ir_system_component)
         self.relevant_documents = relevant_documents
         self.retrieved_documents = retrieved_documents
 
