@@ -22,7 +22,7 @@ class TopicNaming:
         topic_words = sorted(topic_words, key=lambda x: x[1], reverse=True)
 
         # Get the top K words for the topic
-        top_words = [word for word, prob in topic_words[:K]]
+        top_words = [word for word, prob in topic_words[:k]]
 
         print(f"Top {k} words for topic {topic_num}: {top_words}")
 

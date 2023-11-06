@@ -14,16 +14,6 @@ class TopicNumberEstimation:
         self.embedding_dim = self.model.vector_size
         self.word_embeddings = []
 
-    # Retrieve word embeddings for the given vocabulary
-    def get_word_embeddings(self):
-        for word in self.vocabulary:
-            if word in self.model:
-                vector = self.model[word]
-                print(f"Word embedding for '{word}':\n{vector}")
-            else:
-                vector = np.zeros(self.embedding_dim)
-            self.word_embeddings.append(vector)
-
     # Estimate the number of topics using a clustering algorithm
     def estimate_topic_number(self, min_words_per_topic=20):
         clustering = AutoIncrementalClustering(self.word_embeddings, self.model)
@@ -35,6 +25,17 @@ class TopicNumberEstimation:
                 if len(clustering.clusters[cluster_num][ELEMENTS]) >= min_words_per_topic)
 
         return k
+        
+    # Retrieve word embeddings for the given vocabulary
+    def get_word_embeddings(self):
+        for word in self.vocabulary:
+            if word in self.model:
+                vector = self.model[word]
+                print(f"Word embedding for '{word}':\n{vector}")
+            else:
+                vector = np.zeros(self.embedding_dim)
+            self.word_embeddings.append(vector)
+
 
 model_path = os.path.abspath('src')
 model_path += '/Word2Vec/GoogleNews-vectors-negative300.bin'

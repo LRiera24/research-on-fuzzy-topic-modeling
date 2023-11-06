@@ -106,3 +106,5 @@ avg_topic_coherence = sum([t[1] for t in top_topics]) / num_topics
 print('Average topic coherence: %.4f.' % avg_topic_coherence)
 
 pprint(top_topics)
+
+print(model.get_topics())

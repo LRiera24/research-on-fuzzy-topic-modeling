@@ -36,6 +36,9 @@ class LexicalPreprocessing:
         self.tokens = [
             [word for word in doc if word not in stop_words] for doc in self.tokens]
 
+    def filter_extremes(self):
+        pass
+
     def morphological_reduction(self, use_lemmatization=True):
         if use_lemmatization:
             # Lemmatize the tokens
@@ -58,9 +61,6 @@ class LexicalPreprocessing:
                 frequency[token] += 1
 
         self.vocabulary = list(frequency.keys())
-
-    def reduce_vocabulary(self):
-        pass
 
     def vector_representation(self, use_bow=True):
         # Generate the vector representation of the documents using Bag of Words (BoW) or TF-IDF
