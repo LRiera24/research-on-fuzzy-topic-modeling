@@ -1,6 +1,6 @@
 import nltk
 from nltk.corpus import wordnet
-
+from nltk.wsd import lesk
 
 class TopicNaming:
     def __init__(self, model):
@@ -43,34 +43,61 @@ class TopicNaming:
             common_hypernym = common_hypernym.lowest_common_hypernym(synset)
 
 
-words = ['sugar', 'salt', 'pepper']
+words = ['sugar', 'eggs', 'cake', 'food']
 synsets = [wordnet.synsets(word) for word in words]
-# print(synsets)
+print(synsets)
+print()
 
-# for set in synsets:
-#     for s in set:
-#         print(s, s.definition())
-
-common_hypernym = synsets[0][0]
+for set in synsets:
+    print('DEFINITIONS')
+    for s in set:
+        print(s, s.definition())
+    print()
 
 s = synsets[0][0]
-e = synsets[1][1]
+e = synsets[1][0]
 c = synsets[2][2]
 
+print('CHOSEN DEFINITIONS')
 print(s, s.definition())
 print(e, e.definition())
 print(c, c.definition())
-
+print()
 
 def hyper(s): return s.hypernyms()
 
-
+l = [w.lemma_names() for w in list(s.closure(hyper))]
+print(l)
 print(list(s.closure(hyper)))
-print(list(e.closure(hyper)))
-print(list(c.closure(hyper)))
+print()
 
-common_hypernym = s.lowest_common_hypernyms(e)[0].lowest_common_hypernyms(c)[0]
+l = [w.lemma_names() for w in list(e.closure(hyper))]
+print(l)
+print(list(e.closure(hyper)))
+print()
+
+l = [w.lemma_names() for w in list(c.closure(hyper))]
+print(l)
+print(list(c.closure(hyper)))
+print()
+
+print(f'!!!!!!!!!!! {words[0].capitalize()} AND {words[1].capitalize()}')
+common_hypernym = s.lowest_common_hypernyms(e)[0]
 print(common_hypernym)
+
+print(f'!!!!!!!!!!! {words[0].capitalize()} AND {words[2].capitalize()}')
+common_hypernym = s.lowest_common_hypernyms(c)[0]
+print(common_hypernym)
+
+print(f'!!!!!!!!!!! {words[1].capitalize()} AND {words[2].capitalize()}')
+common_hypernym = e.lowest_common_hypernyms(c)[0]
+print(common_hypernym)
+
+
+print(f'!!!!!!!!!!! {words[0].capitalize()} AND {words[1].capitalize()} AND {words[2].capitalize()}')
+common_hypernym = s.lowest_common_hypernyms(c)[0].lowest_common_hypernyms(e)[0]
+print(common_hypernym)
+
 
 # for i in range(1, len(words)):
 #     print(list(common_hypernym.closure(hyper)))
@@ -90,3 +117,4 @@ print(common_hypernym)
 #     common_hypernym = common_hypernym.hypernyms()[0]  # Move up the hierarchy
 #     print(common_hypernym)
 #     depth = common_hypernym.min_depth()
+

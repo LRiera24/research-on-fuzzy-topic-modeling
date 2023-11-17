@@ -20,11 +20,11 @@ class AutoIncrementalClustering:
     def clustering(self):
         # Perform clustering on the provided word embeddings.
         for w_embedding in self.word_embeddings:
-            similarities = self.calculate_similarities(w_embedding)
-            coherences = self.evaluate_quality(w_embedding)
-            self.assignment(w_embedding, similarities, coherences)
+            similarities = self._calculate_similarities(w_embedding)
+            coherences = self._evaluate_quality(w_embedding, similarities)
+            self._assignment(w_embedding, similarities, coherences)
 
-    def calculate_similarities(self, word_embedding):
+    def _calculate_similarities(self, word_embedding):
         # Calculate similarities between the word embedding and existing cluster centroids.
         similarities = []
 
@@ -40,15 +40,16 @@ class AutoIncrementalClustering:
 
         return similarities
 
-    def evaluate_quality(self, word_embedding):
+    def _evaluate_quality(self, word_embedding, sims):
         # Evaluate the quality of clusters based on word embedding coherences within the cluster.
         coherences = []
 
-        for cluster_data in self.clusters.values():
-            cluster_elements = cluster_data[ELEMENTS]
+        pairwise_sims = []
+        
+        for index, _ in sims:
+            cluster_elements = self.clusters[index][ELEMENTS]
 
             # Calculate cosine similarities for pairwise combinations of words in the cluster.
-            pairwise_sims = []
             for pair in itertools.combinations(cluster_elements + [word_embedding], 2):
                 pair = sorted(pair)
                 key = hashlib.md5(f"{pair[0]}-{pair[1]}".encode()).hexdigest()
@@ -76,7 +77,7 @@ class AutoIncrementalClustering:
 
         return coherences
 
-    def assignment(self, word_embedding, similarities, coherences):
+    def _assignment(self, word_embedding, similarities, coherences):
         # Assign the word embedding to an existing or new cluster based on similarities and coherences.
         common_clusters = set(index1 for index1, _ in similarities) & set(
             index2 for index2, _ in coherences)

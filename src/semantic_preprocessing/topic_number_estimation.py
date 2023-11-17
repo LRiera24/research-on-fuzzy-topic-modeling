@@ -3,6 +3,10 @@ import numpy as np
 from auto_incremental_clustering import AutoIncrementalClustering
 import os
 
+# Define path to embeddings model
+model_path = os.path.abspath('src')
+model_path += '/word2vec/GoogleNews-vectors-negative300.bin'
+
 # Define constants
 ELEMENTS = 1  # Used as an index
 
@@ -27,7 +31,7 @@ class TopicNumberEstimation:
         return k
         
     # Retrieve word embeddings for the given vocabulary
-    def get_word_embeddings(self):
+    def _get_word_embeddings(self):
         for word in self.vocabulary:
             if word in self.model:
                 vector = self.model[word]
@@ -37,9 +41,5 @@ class TopicNumberEstimation:
             self.word_embeddings.append(vector)
 
 
-model_path = os.path.abspath('src')
-model_path += '/Word2Vec/GoogleNews-vectors-negative300.bin'
-print (model_path)
-
 estimator = TopicNumberEstimation(["hello", "hola"], model_path)
-estimator.get_word_embeddings()
+estimator._get_word_embeddings()
