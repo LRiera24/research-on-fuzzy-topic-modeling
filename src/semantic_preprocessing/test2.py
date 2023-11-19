@@ -84,6 +84,7 @@ for word in context:
     if best_synset:
         print("Selected Synset:", best_synset.name())
         print("Definition:", best_synset.definition())
+        print("Attributes:", best_synset.entailments())
         print([w.lemma_names() for w in list(best_synset.closure(hyper))])
         chosen_defs.append(best_synset)
     else:
