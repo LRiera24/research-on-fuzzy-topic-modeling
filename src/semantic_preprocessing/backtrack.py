@@ -18,7 +18,7 @@ def average_distance_between_synsets(synsets):
 
     if pair_count == 0:
         return 0.0  # No valid pairs
-
+    
     return total_distance / pair_count
 
 
@@ -77,5 +77,5 @@ def _backtrack_solution(s, w, synsets, best_solution, answer):
                 w[i] = -1
 
 
-context = ['egg', 'sugar', 'flour', 'cake']
+context = ['egg', 'sugar', 'butter']
 backtrack_solution(context)
