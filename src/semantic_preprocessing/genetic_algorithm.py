@@ -212,7 +212,7 @@ def new_population(best_individuals, xover_ratio=0.6, mutation_ratio=0.4):
     return new_population
 
 
-def genetic_algorithm(synsets, generations=500, pop_size=50):
+def genetic_algorithm(synsets, generations=10, pop_size=5):
     population = init_population(synsets, pop_size)
     # print(len(population))
     # for individual in population:
@@ -236,9 +236,9 @@ def genetic_algorithm(synsets, generations=500, pop_size=50):
 
         best_individuals = select_parents(population, fitness_values)
         population = new_population(best_individuals)
-        # print("len(population)", len(population))
-        # for individual in population:
-        #     print(individual)
+        print("len(population)", len(population))
+        for individual in population:
+            print(individual)
 
     chosen_synsets = []
     for index, synset_mask in enumerate(best_solution[SYNSET]):
@@ -249,7 +249,7 @@ def genetic_algorithm(synsets, generations=500, pop_size=50):
     return chosen_synsets, best_solution[FITNESS]
 
 
-context = ['egg', 'sugar', 'butter']
+context = ['salt', 'sugar', 'pepper']
 synsets = [wordnet.synsets(word) for word in context]
 print(synsets)
 

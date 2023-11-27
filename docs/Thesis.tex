@@ -49,12 +49,12 @@
 
 \lstset{style=mystyle}
 
-\title{Sistemas de Recuperaci\'on de Informaci\'on y Modelos de T\'opicos}
+\title{Recuperaci\'on Sem\'antica de Informaci\'on: Un enfoque integrado.}
 \author{\\\vspace{0.25cm}Laura Victoria Riera P\'erez}
 \advisor{\\\vspace{0.25cm}Lic. Carlos León González\\\vspace{0.2cm}Dra. C. Lucina García Hernández}
 \degree{Licenciado en Ciencia de la Computación}
 \faculty{Facultad de Matemática y Computación}
-\date{\today\\\vspace{0.25cm}\href{https://github.com/LRiera24/research-on-topic-modeling}{https://github.com/LRiera24/research-on-topic-modeling}}
+\date{\today\\\vspace{0.25cm}\href{https://github.com/LRiera24/semantic-information-retrieval}{https://github.com/LRiera24/semantic-information-retrieval}}
 \logo{Graphics/uhlogo}
 \makenomenclature
 
@@ -89,6 +89,53 @@
 \mainmatter
 
 \include{MainMatter/Introduction}
+
+%La Recuperación Basada en Preguntas ha transformado la manera en que las consultas se abordan, convirtiéndolas en preguntas semánticas que ofrecen una comprensión profunda de las intenciones del usuario. Los Embeddings proporcionan representaciones vectoriales semánticas, capturando relaciones y significados latentes entre términos. Por otro lado, los Sistemas de Recomendación de Contenido mejoran la experiencia de búsqueda mediante sugerencias personalizadas. Además, las Ontologías y Redes Semánticas modelan relaciones conceptuales, proporcionando un marco organizado para la información. El Aprendizaje Profundo descubre patrones y relaciones complejas, llevando la interpretación de datos a niveles avanzados. Los Modelos de Tópicos se especializan en la clasificación temática, facilitando el acceso eficiente a información relevante, mientras que el Análisis de Sentimientos se enfoca en determinar la polaridad de opiniones y emociones en textos, proporcionando perspectivas valiosas.
+
+%A lo largo de las décadas, los Sistemas de Recuperación de Información (SRI) han evolucionado de manera notable. En los años 1970, se experimentó una transición hacia sistemas basados en el paradigma booleano, introduciendo operadores lógicos y permitiendo consultas más precisas. La década de 1980 marcó la consolidación de índices invertidos para acelerar la búsqueda, mejorando notablemente la eficiencia en la recuperación de información. La irrupción de la World Wide Web en 1991 transformó radicalmente el panorama, con hitos como Yahoo! en 1994 y el algoritmo PageRank de Google en 1996, marcando un nuevo paradigma orientado a la web. En el nuevo milenio, la atención se centró en la recuperación de información web, evidenciada por la creación de la Conferencia CLEF en 2004. 
+
+%Formalmente, \textit{la Recuperación de Información (IR por sus siglas en ingl\'es) es encontrar material (generalmente documentos) de naturaleza no estructurada (generalmente texto) que satisfaga una necesidad de información dentro de grandes colecciones (generalmente almacenadas en computadoras).} \todo{referencia al Introduction} 
+
+%Los Sistemas de Recuperación de Información (SRI) constituyen conjuntos de técnicas y herramientas meticulosamente diseñados con el propósito de extraer información pertinente de vastos conjuntos de datos. Su función primordial consiste en facilitar un acceso eficiente a datos específicos, permitiendo a los usuarios encontrar información relevante de manera rápida y precisa. Estos sistemas desempeñan un papel crucial en entornos digitales al indexar y recuperar documentos almacenados en diversos formatos, incluyendo texto, imágenes, sonido y datos multimedia, enfrentando así el desafío de gestionar la abrumadora cantidad de información disponible en la era digital.
+
+%\subsubsection{Importancia}
+
+%Los SRI trascienden su condición de meras herramientas para convertirse en facilitadores fundamentales en la gestión del conocimiento, en un mundo donde el valor del tiempo es incuestionable, y donde la informaci\'on crece exponencialmente. Los SRI son vitales para procesar grandes volúmenes de datos, realizar análisis y potenciar la eficiencia y accesibilidad en diversos contextos. En el ámbito académico, no solo agilizan la investigación, sino que también fomentan la colaboración entre investigadores, facilitando el acceso a recursos compartidos y promoviendo la difusión eficiente de conocimientos. En el entorno empresarial, incrementan la productividad al facilitar la búsqueda de información esencial y contribuyen a decisiones estratégicas mediante el análisis de datos empresariales. En redes sociales, destacan al personalizar la experiencia del usuario y fortalecen la conexión con recomendaciones adaptadas. En la industria médica, agilizan diagnósticos y tratamientos, proporcionando acceso a vastos repositorios médicos. Culturalmente, contribuyen a la preservación y acceso a archivos históricos y museos virtuales, democratizando el acceso al patrimonio cultural.
+
+%Los SRI son vitales para procesar grandes volúmenes de datos, realizar análisis y potenciar la eficiencia y accesibilidad en diversos contextos, consolidándose as\'i como herramientas fundamentales en la era de la información.
+%
+%En el contexto académico, los Sistemas de Recuperación de Información (SRI) no solo agilizan la investigación y contribuyen al avance del saber, sino que también fomentan la colaboración entre investigadores al facilitar el acceso a recursos compartidos. Estos sistemas promueven la difusión rápida y eficiente de conocimientos, generando un entorno propicio para el intercambio académico y la aceleración del progreso científico.
+%
+%En el ámbito empresarial, estos sistemas incrementan la productividad al proporcionar una estructura organizativa que facilita la búsqueda y recuperación de información esencial para las operaciones comerciales. Además, contribuyen a la toma de decisiones estratégicas al analizar patrones y tendencias dentro de grandes conjuntos de datos empresariales, permitiendo una gestión más informada y eficiente de los recursos y procesos corporativos.
+%
+%En el terreno de las redes sociales, los SRI se destacan al personalizar la experiencia del usuario, adaptando las consultas con precisión a las preferencias individuales y ofreciendo contenido relevante. Además, desempeñan un papel fundamental en la retención y participación de usuarios al proporcionar recomendaciones personalizadas, fortaleciendo así la conexión entre la plataforma y sus usuarios.
+%
+%En la industria médica, los SRI agilizan el proceso de diagnóstico y tratamiento, brindando acceso rápido a vastos repositorios de información médica. Además, facilitan la toma de decisiones clínicas al proporcionar a los profesionales de la salud acceso inmediato a investigaciones, historiales médicos y avances en el campo, contribuyendo así a una atención médica más eficiente y fundamentada en la evidencia.
+%
+%Dentro del ámbito cultural, estos sistemas contribuyen significativamente a la preservación y acceso eficiente a archivos históricos, bibliotecas digitales y museos virtuales. Facilitan la catalogación, organización y recuperación de valiosos recursos culturales, permitiendo a investigadores, académicos y entusiastas acceder a la riqueza del patrimonio cultural de manera rápida y eficaz. Además, juegan un papel crucial en la difusión de la cultura al proporcionar un acceso más amplio y democrático a estas fuentes de conocimiento.
+%
+%Su papel se asemeja al de un guía experimentado, allanando el camino hacia la información en el vasto escenario digital, donde cada búsqueda se convierte en un acto de descubrimiento.
+
+%\subsubsection{historia}
+
+%En la década de 1950, surgen los cimientos de los SRI con la creación de índices y catálogos manuales para bibliotecas. En 1956, la visión pionera de Derek J. de Solla Price marcó un punto de inflexión al proponer el empleo de computadoras para gestionar información bibliográfica, señalando el inicio de una nueva era.
+%
+%Los años 1970 marcan la transición hacia sistemas basados en el paradigma Booleano, utilizando operadores lógicos. Esta década ve nacer los primeros sistemas de recuperación de información que emplean este modelo, permitiendo a los usuarios realizar consultas más precisas. En 1975, la Conferencia SIGIR se establece como un foro clave para la presentación de investigaciones en el campo, promoviendo el intercambio de ideas y avances.
+%
+%En la década de 1980 se consolidó y popularizó el uso de índices invertidos para acelerar la búsqueda de términos. Lo cual permitió una mejora notable en la eficiencia de la recuperación de información al facilitar el acceso a los documentos relevantes de manera más rápida y precisa.
+%
+%Con la irrupción de la World Wide Web en 1991, el panorama cambió radicalmente. En 1994, Yahoo! emerge como uno de los primeros directorios web, y en 1996, Larry Page y Sergey Brin desarrollan el algoritmo PageRank, revolucionando la eficiencia de los motores de búsqueda con la creación de Google. Estos eventos marcan el surgimiento de un nuevo paradigma en la recuperación de información, orientado a la web.
+%
+%El nuevo milenio trae consigo una atención sin precedentes a la recuperación de información web. En 2004, la Conferencia CLEF se establece para evaluar sistemas específicamente diseñados para la recuperación de información. Este período se caracteriza por el rápido crecimiento de la cantidad de datos disponibles en línea y la necesidad de métodos más eficientes para acceder a ellos.
+%
+%La década de 2010 marcó una transición hacia la personalización y la búsqueda semántica. En 2013, Google presenta Hummingbird, un algoritmo diseñado para comprender la intención detrás de las consultas de búsqueda. Estos años también ven un aumento en la personalización de los resultados, utilizando técnicas de aprendizaje automático para adaptar las respuestas a las preferencias individuales de los usuarios.
+%
+%En la actualidad, desde 2020 en adelante, emergen tendencias clave. La inteligencia artificial y el procesamiento del lenguaje natural son explorados para mejorar la precisión y relevancia de los resultados de búsqueda. La búsqueda conversacional y la comprensión contextual destacan como áreas de innovación, marcando una nueva etapa en la narrativa evolutiva de los Sistemas de Recuperación de Información. Este viaje refleja una constante adaptación a los cambios en la creación, compartición y consumo de información, con los SRI desempeñando un papel crucial en esta epopeya digital.
+
+%\subsubsection{limitaciones actuales}
+
+%A pesar de los notables avances en los Sistemas de Recuperación de Información (SRI), diversas limitaciones y desafíos persisten en la actualidad, afectando su eficacia y capacidad para satisfacer las crecientes demandas de los usuarios. Entre las limitaciones más significativas se encuentran la ambigüedad semántica, donde consultas vagas o ambiguas dificultan la comprensión precisa de la intención del usuario, y problemas de relevancia, como el ruido de información y la sensibilidad al contexto, que pueden generar resultados no relevantes. Las limitaciones tecnológicas, como la dificultad para manejar información multimedia y los desafíos en el procesamiento del lenguaje natural, también presentan obstáculos. Además, las preocupaciones éticas, la privacidad del usuario y la adaptación a nuevos contenidos emergentes son áreas críticas a abordar. La evaluación de la calidad de la búsqueda, la interacción conversacional y la desigualdad en el acceso global son aspectos que también requieren atención. En este contexto, es esencial avanzar en investigaciones en inteligencia artificial, procesamiento del lenguaje natural y ética tecnológica para superar estos desafíos y mejorar la efectividad y ética de los SRI, garantizando resultados de búsqueda precisos, relevantes y éticos.
+
 \include{MainMatter/Background}
 \include{MainMatter/Proposal}
 \include{MainMatter/Implementation}

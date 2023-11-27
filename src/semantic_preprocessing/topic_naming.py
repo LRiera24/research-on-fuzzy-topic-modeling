@@ -11,7 +11,7 @@ class TopicNaming:
         # Assign a name to the topic based on the lowest common domain
         for topic_num in range(self.model.num_topics):
             top_words = self.get_top_words(topic_num, 10)
-            synsets = self.get_top_words_synsets(top_words)
+            synsets = self.get_definitions_for_context(top_words)
             self.domains.append(self.get_lowest_common_hypernym(synsets))
 
     def get_top_words(self, topic_num, k):
@@ -28,9 +28,16 @@ class TopicNaming:
 
         return top_words
 
-    def get_top_words_synsets(self, top_words):
-        synsets = [wordnet.synsets(word) for word in top_words]
-        return synsets
+    def get_definitions_for_context(self, context, algorithm='simplex'):
+        synsets = [wordnet.synsets(word) for word in context]
+        chosen_synsets = []
+        if algorithm == 'simplex':
+            pass
+        if algorithm == 'genetic':
+            pass
+        else:
+            pass
+        return chosen_synsets
 
     def get_lowest_common_hypernym(self, synsets):
         # Find the lowest common domain for the topic
