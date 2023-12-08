@@ -1,6 +1,5 @@
-import nltk
 from nltk.corpus import wordnet
-from nltk.wsd import lesk
+from nltk.corpus import wordnet_ic
 
 class TopicNaming:
     def __init__(self, model):
@@ -12,7 +11,7 @@ class TopicNaming:
         for topic_num in range(self.model.num_topics):
             top_words = self.get_top_words(topic_num, 10)
             synsets = self.get_definitions_for_context(top_words)
-            self.domains.append(self.get_lowest_common_hypernym(synsets))
+            self.domains.append(self.get_common_hypernym(synsets))
 
     def get_top_words(self, topic_num, k):
         # Get the most probable words for the specified topic
@@ -39,89 +38,30 @@ class TopicNaming:
             pass
         return chosen_synsets
 
-    def get_lowest_common_hypernym(self, synsets):
+    def get_common_hypernym(self, synsets, thredshole):
         # Find the lowest common domain for the topic
+        
+        tags = {}
+        tags['MAX_OCCURRENCE'] = 0
 
-        # Initialize the common hypernym with the first synset
-        common_hypernym = synsets[0]
+        # Find the minimum depth
+        min_depth = min(s.min_depth() for s in synsets)
 
-        # Find the common hypernym with the rest of the synsets
-        for synset in synsets[1:]:
-            common_hypernym = common_hypernym.lowest_common_hypernym(synset)
+        def hyper(s): return s.hypernyms()
 
+        # Count lemmas at the specified depth
+        for s in synsets:
+            for w in list(s.closure(hyper)):
+                if w.min_depth() == min_depth:
+                    tags[w] = tags.get(w, 0) + 1 
+                    tags['MAX_OCCURRENCE'] = max(tags['MAX_OCCURRENCE'], tags[w])
 
-words = ['sugar', 'eggs', 'cake', 'food']
-synsets = [wordnet.synsets(word) for word in words]
-print(synsets)
-print()
-
-for set in synsets:
-    print('DEFINITIONS')
-    for s in set:
-        print(s, s.definition())
-    print()
-
-s = synsets[0][0]
-e = synsets[1][0]
-c = synsets[2][2]
-
-print('CHOSEN DEFINITIONS')
-print(s, s.definition())
-print(e, e.definition())
-print(c, c.definition())
-print()
-
-def hyper(s): return s.hypernyms()
-
-l = [w.lemma_names() for w in list(s.closure(hyper))]
-print(l)
-print(list(s.closure(hyper)))
-print()
-
-l = [w.lemma_names() for w in list(e.closure(hyper))]
-print(l)
-print(list(e.closure(hyper)))
-print()
-
-l = [w.lemma_names() for w in list(c.closure(hyper))]
-print(l)
-print(list(c.closure(hyper)))
-print()
-
-print(f'!!!!!!!!!!! {words[0].capitalize()} AND {words[1].capitalize()}')
-common_hypernym = s.lowest_common_hypernyms(e)[0]
-print(common_hypernym)
-
-print(f'!!!!!!!!!!! {words[0].capitalize()} AND {words[2].capitalize()}')
-common_hypernym = s.lowest_common_hypernyms(c)[0]
-print(common_hypernym)
-
-print(f'!!!!!!!!!!! {words[1].capitalize()} AND {words[2].capitalize()}')
-common_hypernym = e.lowest_common_hypernyms(c)[0]
-print(common_hypernym)
-
-
-print(f'!!!!!!!!!!! {words[0].capitalize()} AND {words[1].capitalize()} AND {words[2].capitalize()}')
-common_hypernym = s.lowest_common_hypernyms(c)[0].lowest_common_hypernyms(e)[0]
-print(common_hypernym)
-
-
-# for i in range(1, len(words)):
-#     print(list(common_hypernym.closure(hyper)))
-#     common_hypernym = common_hypernym.lowest_common_hypernyms(synsets[i][i])[0]
-#     print(f'mid: {common_hypernym}')
-# print(f'final: {common_hypernym}')
-
-# common_hypernym = synsets[0][0].lowest_common_hypernyms(synsets[2][0])[0]
-# print(common_hypernym)
-
-# # Determine the depth of the common hypernym
-# depth = common_hypernym.min_depth()
-# print(depth)
-
-# # If the depth is too high, find a more general hypernym
-# while depth > 9:  # You can adjust the depth threshold as needed
-#     common_hypernym = common_hypernym.hypernyms()[0]  # Move up the hierarchy
-#     print(common_hypernym)
-#     depth = common_hypernym.min_depth()
+        print(tags)
+        print('CHOSEN TAGS')
+        for l in tags.keys():
+            try:    
+                if tags[l] == tags['MAX_OCCURRENCE']:
+                    print(l, l.min_depth())
+            except:
+                pass
 

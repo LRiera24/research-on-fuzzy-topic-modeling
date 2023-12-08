@@ -5,17 +5,18 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import numpy as np
 import os
 from gensim.models import KeyedVectors
+from math import inf 
 
-nltk.download('punkt')
-nltk.download('wordnet')
+# nltk.download('punkt')
+# nltk.download('wordnet')
 
-# Define path to embeddings model
-model_path = os.path.abspath('src')
-model_path += '/word2vec/GoogleNews-vectors-negative300.bin'
-print(model_path)
+# # Define path to embeddings model
+# model_path = os.path.abspath('src')
+# model_path += '/word2vec/GoogleNews-vectors-negative300.bin'
+# print(model_path)
 
 # Load pre-trained word embeddings (Word2Vec model)
-word2vec_model = KeyedVectors.load_word2vec_format(model_path, binary=True)
+# word2vec_model = KeyedVectors.load_word2vec_format(model_path, binary=True)
 
 def lesk_embedding(word, context, model, synsets=None):
     if synsets is None:
@@ -34,15 +35,16 @@ def lesk_embedding(word, context, model, synsets=None):
     max_similarity = float('-inf')
 
     for synset in synsets:
-        definition_embedding = np.mean([model[word] for word in word_tokenize(synset.definition()) if word in model and word in important_terms], axis=0)
-        
-        if definition_embedding is not None:
-            similarity = np.dot(context_embedding, definition_embedding) / (np.linalg.norm(context_embedding) * np.linalg.norm(definition_embedding))
+        if synset.pos() != 'v':
+            definition_embedding = np.mean([model[word] for word in word_tokenize(synset.definition()) if word in model and word in important_terms], axis=0)
+            
+            if definition_embedding is not None:
+                similarity = np.dot(context_embedding, definition_embedding) / (np.linalg.norm(context_embedding) * np.linalg.norm(definition_embedding))
 
-            if similarity > max_similarity:
-                max_similarity = similarity
-                best_synset = synset
-                print(best_synset.definition(), similarity)
+                if similarity > max_similarity:
+                    max_similarity = similarity
+                    best_synset = synset
+                    print(best_synset.definition(), similarity)
 
     return best_synset
 
@@ -73,25 +75,83 @@ def extract_important_terms(definitions, top_n=5):
 def hyper(s): return s.hypernyms()
 
 # Example Usage
-context = ['egg', 'sugar', 'butter', 'flour', 'recipe', 'cake', 'dessert']
+# context = ['dog', 'cat', 'rabbit']
+# context = ['egg', 'sugar', 'butter', 'flour', 'recipe', 'cake', 'dessert']
+# context = ['birthday', 'party', 'gift', 'music', 'candles', 'wish']
+# context = ['computer', 'program', 'development', 'application', 'web', 'data']
+context = ['school', 'student', 'book', 'teacher']
 chosen_defs = []
 
-for word in context:
-    print(word)
-    synsets = wordnet.synsets(word)
-    best_synset = lesk_embedding(word, context, word2vec_model, synsets=synsets)
+# lemmas = {}
+# lemmas['MAX_OCCURRENCE'] = 0 
 
-    if best_synset:
-        print("Selected Synset:", best_synset.name())
-        print("Definition:", best_synset.definition())
-        print("Attributes:", best_synset.entailments())
-        print([w.lemma_names() for w in list(best_synset.closure(hyper))])
-        chosen_defs.append(best_synset)
-    else:
-        print("No suitable synset found.")
+# for word in context:
+#     print(word)
+#     synsets = wordnet.synsets(word)
+#     best_synset = lesk_embedding(word, context, word2vec_model, synsets=synsets)
 
-    print()
+#     if best_synset:
+#         print("Selected Synset:", best_synset.name())
+#         print("Definition:", best_synset.definition())
+#         print("Attributes:", best_synset.entailments())
+#         print('Lemmas', [w.lemma_names() for w in list(best_synset.closure(hyper)) if w.min_depth() > 5])
+#         # sum = 0
+#         # c = 0
+#         # for w in list(best_synset.closure(hyper)): 
+#         #     d = w.min_depth()
+#         #     if d > 3:
+#         #         sum += w.min_depth()
+#         #         c += 1
+#         # mean = round(sum / c)
+#         # print('mean', mean)
+#         # print(sum/c)
+        
+#         chosen_defs.append(best_synset)
+#     else:
+#         print("No suitable synset found.")
 
-print(chosen_defs)
-common_hypernym = chosen_defs[0].lowest_common_hypernyms(chosen_defs[1])
-print(common_hypernym)
+#     print()
+
+# print(chosen_defs)
+# # min = inf
+# # for cd in chosen_defs:
+# #     d = cd.min_depth()
+# #     if d < min:
+# #         min = d
+# #     print(d)
+# # print('min', min)
+
+# sum = 0
+# c = 0
+# # for cd in chosen_defs:
+# #     d = cd.min_depth()
+# #     sum += d
+# #     c += 1
+# #     print(d)
+# # mean = sum / c
+# # print('mean', mean)
+
+# for s in chosen_defs:
+#     for w in list(s.closure(hyper)): 
+#                     # print(w)
+#                     d = w.min_depth()
+#                     # print(d, mean)
+#                     if 3 < d:
+#                         lemmas[w] = lemmas.get(w, 0) + 1 
+#                         if lemmas['MAX_OCCURRENCE'] < lemmas[w]:
+#                             lemmas['MAX_OCCURRENCE'] = lemmas[w]
+
+# print(lemmas)
+# print('CHOSEN TAGS')
+# for l in lemmas.keys():
+#     try:    
+#         if lemmas[l] == lemmas['MAX_OCCURRENCE']:
+#             d = l.min_depth()
+#             sum += d
+#             c += 1
+#             print(l, d)
+#     except:
+#         pass
+
+# mean = round(sum / c)
+# print('mean', mean)

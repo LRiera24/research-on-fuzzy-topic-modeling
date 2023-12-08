@@ -77,5 +77,5 @@ def _backtrack_solution(s, w, synsets, best_solution, answer):
                 w[i] = -1
 
 
-context = ['salt', 'sugar', 'pepper']
+context = ['homework', 'pencil', 'school', 'write', 'notebook']
 backtrack_solution(context)
