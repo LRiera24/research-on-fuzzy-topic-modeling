@@ -22,13 +22,12 @@ def average_distance_between_synsets(synsets):
     return total_distance / pair_count
 
 
-def backtrack_solution(words):
+def backtrack_solution(synsets):
 
     # boolean array to mark selected candidates
-    w = [-1 for i in range(len(words))]
+    w = [-1 for i in range(len(synsets))]
     print(f'w: {w}')
 
-    synsets = [wordnet.synsets(word) for word in words]
     print(f'syn: {synsets}')
 
     s = [[False for _ in inner_list] for inner_list in synsets]
@@ -51,7 +50,7 @@ def backtrack_solution(words):
     for index, value in enumerate(solution):
         print(synsets[index][value].definition())
 
-    return solution.tolist(), value
+    return [synsets[i][j] for i,j in enumerate(solution.tolist())]
 
 
 def _backtrack_solution(s, w, synsets, best_solution, answer):
@@ -78,4 +77,5 @@ def _backtrack_solution(s, w, synsets, best_solution, answer):
 
 
 context = ['homework', 'pencil', 'school', 'write', 'notebook']
-backtrack_solution(context)
+synsets = [wordnet.synsets(word) for word in context]
+print(backtrack_solution(synsets))

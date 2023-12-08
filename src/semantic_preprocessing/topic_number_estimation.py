@@ -12,9 +12,9 @@ ELEMENTS = 1  # Used as an index
 
 # Class for estimating the number of topics using word embeddings
 class TopicNumberEstimation:
-    def __init__(self, vocabulary, model_path):
+    def __init__(self, vocabulary, embeddings_model):
         self.vocabulary = vocabulary
-        self.model = KeyedVectors.load_word2vec_format(model_path, binary=True)
+        self.model = embeddings_model
         self.embedding_dim = self.model.vector_size
         self.word_embeddings = []
 

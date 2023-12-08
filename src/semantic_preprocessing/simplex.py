@@ -58,14 +58,14 @@ def solve_optimization_problem(problem):
 def custom_distance_function(i, j, i_prime, j_prime, synsets, calculated_distances):
     synset1 = synsets[i-1][j-1]
     synset2 = synsets[i_prime-1][j_prime-1]
-    if (synset1, synset2) in calculated_distances or (synset2, synset1) in calculated_distances:
+    if (synset1, synset2) in calculated_distances or (synset2, synset1) in calculated_distances or synset1.pos() == 'v' or synset2.pos() == 'v':
         return 0
     print(synset1, synset2)
     calculated_distances.append((synset1, synset2))
     return synset1.path_similarity(synset2)
 
 
-def print_solution(x, N, K, context, synsets):
+def print_solution(x, N, K, synsets):
     res = []
     for i in range(1, N + 1):
         chosen_item = [j for j in range(
@@ -73,23 +73,47 @@ def print_solution(x, N, K, context, synsets):
         chosen_item = synsets[i-1][chosen_item-1]
         res.append(chosen_item)
         print(
-            f"Word: {context[i-1]} ---> Chosen definition: {chosen_item} {chosen_item.definition()}")
-    return (res)
+            f"Chosen definition: {chosen_item} {chosen_item.definition()}")
+            # f"Word: {context[i-1]} ---> Chosen definition: {chosen_item} {chosen_item.definition()}")
+    return res
 
+def simplex_sol(synsets):
+    N = len(synsets)  # Number of elements
+    # Number of items for each element
+    K = [len(word_synset) for word_synset in synsets]
+    print(N, K)
+
+    problem, x = create_optimization_problem(
+    N, K, custom_distance_function, synsets)
+    solve_optimization_problem(problem)
+
+    print("Objective value:", value(problem.objective), '\n')
+
+    r = print_solution(x, N, K, synsets)
+
+    return r
 
 # Example usage
-context = ['birthday', 'party', 'gift', 'music', 'candles', 'wish']
-synsets = [wordnet.synsets(word) for word in context]
+# context = ['dog', 'cat', 'rabbit']
+# context = ['egg', 'sugar', 'butter', 'flour', 'recipe', 'cake', 'dessert']
+# context = ['birthday', 'party', 'gift', 'music', 'candles', 'wish']
+# context = ['computer', 'program', 'development', 'web', 'application', 'data']
+# context = ['school', 'class', 'homework', 'student', 'book', 'knowledge', 'learn', 'teach']
 
-N = len(context)  # Number of elements
-# Number of items for each element
-K = [len(word_synset) for word_synset in synsets]
-print(N, K)
+# synsets = [wordnet.synsets(word) for word in context]
+# r = simplex_sol(synsets)
+# print(r)
 
-problem, x = create_optimization_problem(
-    N, K, custom_distance_function, synsets)
-solve_optimization_problem(problem)
+# N = len(context)  # Number of elements
+# # Number of items for each element
+# K = [len(word_synset) for word_synset in synsets]
+# print(N, K)
 
-print("Objective value:", value(problem.objective), '\n')
+# problem, x = create_optimization_problem(
+#     N, K, custom_distance_function, synsets)
+# solve_optimization_problem(problem)
 
-r = print_solution(x, N, K, context, synsets)
+# print("Objective value:", value(problem.objective), '\n')
+
+# r = print_solution(x, N, K, context, synsets)
+# print(r)
