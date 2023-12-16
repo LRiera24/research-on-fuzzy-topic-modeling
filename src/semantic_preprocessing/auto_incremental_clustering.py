@@ -13,11 +13,12 @@ ELEMENTS = 1
 WORDS = 2
 
 class AutoIncrementalClustering:
-    def __init__(self, words, word_embeddings, model, min_coherence=0.6):
+    def __init__(self, words, occurrences, word_embeddings, model, min_coherence=0.01):
         # Initialize the class with provided word embeddings, a model, and a minimum coherence threshold.
         self.words = words
+        self.occurrences = occurrences
         self.word_embeddings = word_embeddings
-        self.min_coherence = min_coherence
+        self.min_similarity = min_coherence
         self.model = model
         self.clusters = {}
         self.pairwise_similarities = {}
@@ -32,10 +33,12 @@ class AutoIncrementalClustering:
                 continue
             similarities = self._calculate_similarities(w_embedding)
             print("!!!!!!!!!!!!!!! SIMS DONE")
-            coherences = self._evaluate_quality(w_embedding, similarities)
+            coherences = self._evaluate_coherence(self.words[index], similarities)
             print("!!!!!!!!!!!!!!! QUALITY DONE")
             self._assignment(index, w_embedding, similarities, coherences)
             print("!!!!!!!!!!!!!!! ASSIGNMENT DONE")
+            for a in self.clusters.values():
+                print(a[2])
 
     def _calculate_similarities(self, word_embedding):
         # Calculate similarities between the word embedding and existing cluster centroids.
@@ -43,59 +46,41 @@ class AutoIncrementalClustering:
 
         for index, cluster_data in enumerate(self.clusters.values()):
             cluster_centroid = cluster_data[CENTROID]
-            print("c", cluster_centroid)
+            # print("c", cluster_centroid)
             similarity = np.dot(word_embedding, cluster_centroid) / (
                 np.linalg.norm(word_embedding) * np.linalg.norm(cluster_centroid))
-            print("sim", similarity)
             similarities.append((index, similarity))
 
-        print(similarities)
         # Calculate harmonic mean of similarities and filter clusters based on a threshold.
-        harmonic_mean = hmean([round(sim, 6) for _, sim in similarities if sim >= 0])
-        print(harmonic_mean)
+        harmonic_mean = hmean([sim for _, sim in similarities if sim >= 0])
         similarities = [(cluster_num, similarity) for cluster_num,
-                        similarity in similarities if similarity >= harmonic_mean]
+                        similarity in similarities if similarity >= self.min_similarity]
+
+        print("similarities",similarities)
 
         return similarities
 
-    def _evaluate_quality(self, word_embedding, sims):
+    def _evaluate_coherence(self, word, sims):
         # Evaluate the quality of clusters based on word embedding coherences within the cluster.
         coherences = []
 
-        pairwise_sims = {}
+        word_coocurrences = self.occurrences[word]
         
         for index, _ in sims:
-            cluster_elements = self.clusters[index][ELEMENTS]
-
-            # Calculate cosine similarities for pairwise combinations of words in the cluster.
-            for pair in itertools.combinations(cluster_elements + [word_embedding], 2):
-                pair = sorted(pair, key=lambda x: x[0])
-                key = hashlib.md5(f"{pair[0]}-{pair[1]}".encode()).hexdigest()
-                if key in pairwise_sims.keys():
-                    similarity = pairwise_sims[key]
-                else:
-                    similarity = np.dot(pair[0], pair[1]) / (
-                        np.linalg.norm(pair[0]) * np.linalg.norm(pair[1]))
-                    pairwise_sims[key] = similarity
+            cluster_elements = self.clusters[index][WORDS]
+            coherence = 0
+            for w in cluster_elements:
+                if w in word_coocurrences.keys():
+                    coherence += 1
 
             # Calculate coherence for the cluster by averaging the pairwise similarities.
-            coherence = mean(pairwise_sims.values())
+            coherence = coherence / len(cluster_elements)
             coherences.append(coherence)
 
-        # Normalize coherences between 0 and 1, and filter clusters based on a coherence threshold.
-        min_coherence = min(coherences)
-        max_coherence = max(coherences)
-
-        if min_coherence < max_coherence:
-            range_coherence = max_coherence - min_coherence
-            coherences = [(coherence - min_coherence) / range_coherence for coherence in coherences]
-        else:
-            coherences = [0.0] * len(coherences)
-
         coherences = [(cluster_num, coherence) for cluster_num, coherence in zip(
-            self.clusters.keys(), coherences) if coherence >= self.min_coherence]
+            self.clusters.keys(), coherences) if coherence >= 0.5]
 
-        print(coherences)
+        print("coherences", coherences)
         return coherences
 
     def _assignment(self, index, word_embedding, similarities, coherences):
@@ -127,13 +112,14 @@ word2vec_model = KeyedVectors.load_word2vec_format(model_path, binary=True)
 # context = ['egg', 'sugar', 'butter', 'flour', 'recipe', 'cake', 'dessert']
 # context = ['birthday', 'party', 'gift', 'music', 'candles', 'wish']
 # context = ['computer', 'program', 'development', 'web', 'application', 'data']
-context = ['school', 'class', 'homework', 'student', 'book', 'knowledge', 'learn', 'teach', 'dog', 'cat', 'rabbit',
+context = ['school', 'life', 'class', 'homework', 'student', 'book', 'knowledge', 'learn', 'teach', 'dog', 'cat', 'rabbit',
             'egg', 'sugar', 'butter', 'flour', 'recipe', 'cake', 'dessert', 'birthday', 'party', 'gift', 'music', 
-            'candles', 'wish', 'computer', 'program', 'development', 'web', 'application', 'data']
+            'candle', 'wish', 'computer', 'program', 'development', 'web', 'application', 'data']
 
+occurrence = {'life': {}, 'dog': {'cat': 1.0, 'rabbit': 1.0}, 'cat': {'dog': 1.0, 'rabbit': 1.0}, 'rabbit': {'dog': 1.0, 'cat': 1.0}, 'egg': {'sugar': 1.0, 'butter': 1.0, 'flour': 1.0, 'recipe': 1.0, 'cake': 1.0, 'dessert': 1.0}, 'sugar': {'egg': 1.0, 'butter': 1.0, 'flour': 1.0, 'recipe': 1.0, 'cake': 1.0, 'dessert': 1.0}, 'butter': {'egg': 1.0, 'sugar': 1.0, 'flour': 1.0, 'recipe': 1.0, 'cake': 1.0, 'dessert': 1.0}, 'flour': {'egg': 1.0, 'sugar': 1.0, 'butter': 1.0, 'recipe': 1.0, 'cake': 1.0, 'dessert': 1.0}, 'recipe': {'egg': 1.0, 'sugar': 1.0, 'butter': 1.0, 'flour': 1.0, 'cake': 1.0, 'dessert': 1.0}, 'cake': {'egg': 1.0, 'sugar': 1.0, 'butter': 1.0, 'flour': 1.0, 'recipe': 1.0, 'dessert': 1.0}, 'dessert': {'egg': 1.0, 'sugar': 1.0, 'butter': 1.0, 'flour': 1.0, 'recipe': 1.0, 'cake': 1.0}, 'birthday': {'party': 1.0, 'gift': 1.0, 'music': 1.0, 'candle': 1.0, 'wish': 1.0}, 'party': {'birthday': 1.0, 'gift': 1.0, 'music': 1.0, 'candle': 1.0, 'wish': 1.0}, 'gift': {'birthday': 1.0, 'party': 1.0, 'music': 1.0, 'candle': 1.0, 'wish': 1.0}, 'music': {'birthday': 1.0, 'party': 1.0, 'gift': 1.0, 'candle': 1.0, 'wish': 1.0}, 'candle': {'birthday': 1.0, 'party': 1.0, 'gift': 1.0, 'music': 1.0, 'wish': 1.0}, 'wish': {'birthday': 1.0, 'party': 1.0, 'gift': 1.0, 'music': 1.0, 'candle': 1.0}, 'computer': {'program': 1.0, 'development': 1.0, 'web': 1.0, 'application': 1.0, 'data': 1.0}, 'program': {'computer': 1.0, 'development': 1.0, 'web': 1.0, 'application': 1.0, 'data': 1.0}, 'development': {'computer': 1.0, 'program': 1.0, 'web': 1.0, 'application': 1.0, 'data': 1.0}, 'web': {'computer': 1.0, 'program': 1.0, 'development': 1.0, 'application': 1.0, 'data': 1.0}, 'application': {'computer': 1.0, 'program': 1.0, 'development': 1.0, 'web': 1.0, 'data': 1.0}, 'data': {'computer': 1.0, 'program': 1.0, 'development': 1.0, 'web': 1.0, 'application': 1.0}, 'school': {'class': 1.0, 'homework': 1.0, 'student': 1.0, 'book': 1.0, 'knowledge': 1.0, 'learn': 1.0, 'teach': 1.0}, 'class': {'school': 1.0, 'homework': 1.0, 'student': 1.0, 'book': 1.0, 'knowledge': 1.0, 'learn': 1.0, 'teach': 1.0}, 'homework': {'school': 1.0, 'class': 1.0, 'student': 1.0, 'book': 1.0, 'knowledge': 1.0, 'learn': 1.0, 'teach': 1.0}, 'student': {'school': 1.0, 'class': 1.0, 'homework': 1.0, 'book': 1.0, 'knowledge': 1.0, 'learn': 1.0, 'teach': 1.0}, 'book': {'school': 1.0, 'class': 1.0, 'homework': 1.0, 'student': 1.0, 'knowledge': 1.0, 'learn': 1.0, 'teach': 1.0}, 'knowledge': {'school': 1.0, 'class': 1.0, 'homework': 1.0, 'student': 1.0, 'book': 1.0, 'learn': 1.0, 'teach': 1.0}, 'learn': {'school': 1.0, 'class': 1.0, 'homework': 1.0, 'student': 1.0, 'book': 1.0, 'knowledge': 1.0, 'teach': 1.0}, 'teach': {'school': 1.0, 'class': 1.0, 'homework': 1.0, 'student': 1.0, 'book': 1.0, 'knowledge': 1.0, 'learn': 1.0}}
 embeddings = [word2vec_model[word] for word in context]
 
-cluster = AutoIncrementalClustering(context, embeddings, word2vec_model)
+cluster = AutoIncrementalClustering(context, occurrence, embeddings, word2vec_model)
 cluster.clustering()
-for t in cluster.clusters.values():
-    print(t[WORDS])
+# for t in cluster.clusters.values():
+#     print(t[WORDS])

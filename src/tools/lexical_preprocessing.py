@@ -4,7 +4,8 @@ from nltk.stem import PorterStemmer, WordNetLemmatizer
 from gensim import corpora, models
 from collections import defaultdict
 from gensim.corpora import Dictionary
-
+import numpy as np
+from collections import Counter
 
 class LexicalPreprocessing:
     def __init__(self):
@@ -78,6 +79,39 @@ class LexicalPreprocessing:
             tfidf = models.TfidfModel(corpus)
             self.vector_repr = [tfidf[doc] for doc in corpus]
 
+    def _calculate_co_occurrence_matrix(self, window_size=2):
+        window_size = len(self.vocabulary)
+        # Flatten the list of tokenized documents
+        flat_documents = [token for doc in self.morphed_tokens for token in doc]
+
+        # Compute the frequency distribution of words
+        fdist = Counter(flat_documents)
+
+        # Initialize the co-occurrence dictionary
+        co_occurrence_dict = {word: {} for word in self.vocabulary}
+
+        # Iterate over each document
+        for doc in self.morphed_tokens:
+            # Iterate over each word in the document
+            for i, word in enumerate(doc):
+                # Get the context window around the current word
+                start = max(0, i - window_size)
+                end = min(len(doc), i + window_size + 1)
+                context = doc[start:end]
+
+                # Update co-occurrence counts
+                for context_word in context:
+                    if word != context_word and word in self.vocabulary and context_word in self.vocabulary:
+                        co_occurrence_dict[word][context_word] = co_occurrence_dict[word].get(context_word, 0) + 1
+
+        # Normalize the co-occurrence dictionary
+        for word, context_dict in co_occurrence_dict.items():
+            total_word_frequency = fdist[word]
+            for context_word, count in context_dict.items():
+                co_occurrence_dict[word][context_word] = count / (total_word_frequency * fdist[context_word])
+
+        return co_occurrence_dict
+
     def __repr__(self) -> str:
         # Get all attributes of the class as a dictionary and format them for printing
         attributes = vars(self)
@@ -87,11 +121,20 @@ class LexicalPreprocessing:
 
 
 # Create a list of documents (each document is a list of words)
-documents = ["This is creation the first document.", "This document is the second document.",
-             "And this is the third one.", "Is this the first document?"]
+documents = ["This is first creation the first document.", "This document is the second document.",
+             "And this is the third one.", "Is hola document laura victoria riera perez holita holiwis fuera this the first document?"]
+
+documents = ['dog, cat, rabbit', 
+            'egg, sugar, butter, flour, recipe, cake, dessert', 
+            'birthday, party, gift, music, candles, wish', 
+            'computer, program, development, web, application, data', 
+            'school, class, homework, student, book, knowledge, learn, teach']
 
 # Initialize the LexicalPreprocessing class with your documents
 preprocessor = LexicalPreprocessing()
 preprocessor.preprocess_text(documents)
 
 print(preprocessor)
+
+co_occurrence_matrix = preprocessor._calculate_co_occurrence_matrix()
+print(co_occurrence_matrix)

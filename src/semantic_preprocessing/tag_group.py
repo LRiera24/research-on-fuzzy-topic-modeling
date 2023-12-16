@@ -76,10 +76,10 @@ model_path = os.path.abspath('src')
 model_path += '/word2vec/GoogleNews-vectors-negative300.bin'
 embeddings_model = KeyedVectors.load_word2vec_format(model_path, binary=True)
 
-# context = ['dog', 'cat', 'rabbit']
+# context = ['dog', 'cat', 'rabbit', 'pig', 'bird']
 # context = ['egg', 'sugar', 'butter', 'flour', 'recipe', 'cake', 'dessert']
-# context = ['birthday', 'party', 'gift', 'music', 'candles', 'wish']
-# context = ['computer', 'program', 'development', 'web', 'application', 'data']
+# context = ['birthday', 'party', 'gift', 'music', 'people', 'candles', 'wish']
+# context = ['computer', 'web', 'internet', 'network', 'communication']
 context = ['school', 'class', 'homework', 'student', 'book', 'knowledge', 'learn', 'teach']
 
 context_synsets = []
