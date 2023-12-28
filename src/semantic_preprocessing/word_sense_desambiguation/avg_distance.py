@@ -35,10 +35,10 @@ def calculate_mean_similarity(synsets, measure='path'):
     return mean_similarity
 
 # Example Usage
-context = ['egg', 'sugar', 'butter', 'flour', 'recipe', 'cake', 'dessert', 'bake', 'sweet', 'birthday']
+# context = ['egg', 'sugar', 'butter', 'flour', 'recipe', 'cake', 'dessert', 'bake', 'sweet', 'birthday']
 
-word_synsets = [wordnet.synsets(word)[0] for word in context]  # Assuming you want only the first synset for each word
+# word_synsets = [wordnet.synsets(word)[0] for word in context]  # Assuming you want only the first synset for each word
 
-avg_distance = calculate_mean_similarity(word_synsets)
+# avg_distance = calculate_mean_similarity(word_synsets)
 
-print("Average Distance Between Synsets:", avg_distance)
+# print("Average Distance Between Synsets:", avg_distance)

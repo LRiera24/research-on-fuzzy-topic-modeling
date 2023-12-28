@@ -27,7 +27,7 @@ def lesk_embedding(word, context, model, synsets=None):
 
     # Extract important terms using TF-IDF
     important_terms = extract_important_terms([synset.definition() for synset in synsets], top_n=5)
-    print(important_terms)
+    # print(important_terms)
 
     context_embedding = np.mean([model[word] for word in context if word in model], axis=0)
 
@@ -44,7 +44,7 @@ def lesk_embedding(word, context, model, synsets=None):
                 if similarity > max_similarity:
                     max_similarity = similarity
                     best_synset = synset
-                    print(best_synset.definition(), similarity)
+                    # print(best_synset.definition(), similarity)
 
     return best_synset
 
@@ -79,8 +79,8 @@ def hyper(s): return s.hypernyms()
 # context = ['egg', 'sugar', 'butter', 'flour', 'recipe', 'cake', 'dessert']
 # context = ['birthday', 'party', 'gift', 'music', 'candles', 'wish']
 # context = ['computer', 'program', 'development', 'application', 'web', 'data']
-context = ['school', 'student', 'book', 'teacher']
-chosen_defs = []
+# context = ['school', 'student', 'book', 'teacher']
+# chosen_defs = []
 
 # lemmas = {}
 # lemmas['MAX_OCCURRENCE'] = 0 

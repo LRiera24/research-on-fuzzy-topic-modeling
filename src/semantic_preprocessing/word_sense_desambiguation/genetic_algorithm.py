@@ -1,5 +1,5 @@
 import random
-from avg_distance import calculate_mean_similarity
+from semantic_preprocessing.word_sense_desambiguation.avg_distance import calculate_mean_similarity
 from math import inf
 from nltk.corpus import wordnet
 
@@ -249,17 +249,17 @@ def genetic_algorithm(synsets, generations=10, pop_size=5):
     return chosen_synsets, best_solution[FITNESS]
 
 
-context = ['salt', 'sugar', 'pepper']
-synsets = [wordnet.synsets(word) for word in context]
-print(synsets)
+# context = ['salt', 'sugar', 'pepper']
+# synsets = [wordnet.synsets(word) for word in context]
+# print(synsets)
 
-chosen, value = genetic_algorithm(synsets)
-defs = [s.definition() for s in chosen]
+# chosen, value = genetic_algorithm(synsets)
+# defs = [s.definition() for s in chosen]
 
-for i in range(len(chosen)):
-    print(chosen[i], defs[i])
+# for i in range(len(chosen)):
+#     print(chosen[i], defs[i])
 
-print(value)
+# print(value)
 
 # print(mutate([[0, 0, 1, 0], [1, 0, 0, 0], [0, 0, 0, 1, 0], [1, 0, 0], [0, 1, 0], [1]]))
 

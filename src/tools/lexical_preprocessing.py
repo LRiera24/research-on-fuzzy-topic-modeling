@@ -1,21 +1,41 @@
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
+from nltk.corpus import words
 from nltk.stem import PorterStemmer, WordNetLemmatizer
 from gensim import corpora, models
 from collections import defaultdict
-from gensim.corpora import Dictionary
-import numpy as np
-from collections import Counter
+import json
+import os
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.preprocessing import normalize
 
 class LexicalPreprocessing:
+    """
+    Class for performing lexical preprocessing on a collection of text documents.
+    """
+
     def __init__(self):
+        """
+        Initialize the LexicalPreprocessing class.
+        """
         self.tokens = []  # List to store tokenized documents
         self.morphed_tokens = []  # List to store stemmed or lemmatized tokens
         self.vocabulary = []  # List to store the processed vocabulary
         self.vector_repr = None  # Vector representation of the documents
         self.dictionary = None  # Represents a Gensim Dictionary
+        self.co_occurrence_dict = None  # Co-ocurrence matrix of the corpus
 
-    def preprocess_text(self, documents):
+    def preprocess_text(self, documents, name):
+        """
+        Perform lexical preprocessing on the given documents.
+
+        Parameters:
+        - documents (list): List of input documents.
+        - name (str): Name of the corpus (used for saving co-occurrence matrix).
+
+        Returns:
+        - None
+        """
         self._tokenization(documents)
         self._remove_noise()
         self._remove_stopwords()
@@ -23,43 +43,82 @@ class LexicalPreprocessing:
         self._filter_tokens_by_occurrence()
         self._build_vocabulary()
         self._vector_representation()
+        self._calculate_co_occurrence_matrix(name)
 
     def _tokenization(self, documents):
-        # Tokenizes the input documents and stores them in 'self.tokens'
+        """
+        Tokenize the input documents and store them in 'self.tokens'.
+
+        Parameters:
+        - documents (list): List of input documents.
+
+        Returns:
+        - None
+        """
         self.tokens = [word_tokenize(doc) for doc in documents]
 
     def _remove_noise(self):
-        # Removes non-alphabetic words and converts to lowercase
+        """
+        Remove non-alphabetic words and convert to lowercase.
+
+        Returns:
+        - None
+        """
         self.tokens = [
-            [word.lower() for word in doc if word.isalpha()] for doc in self.tokens]
+            [word.lower() for word in doc if word.isalpha() and len(word)>1] for doc in self.tokens]
 
     def _remove_stopwords(self):
-        # Removes common English stopwords
+        """
+        Remove common English stopwords.
+
+        Returns:
+        - None
+        """
         stop_words = set(stopwords.words('english'))
         self.tokens = [
             [word for word in doc if word not in stop_words] for doc in self.tokens]
 
     def _filter_tokens_by_occurrence(self, no_below=0.1, no_above=0.5):
-        # Generate the vector representation of the documents using Bag of Words (BoW) or TF-IDF
-        self.dictionary = corpora.Dictionary(self.morphed_tokens)
+        """
+        Filter out infrequent and highly frequent words.
 
-        # Filter out words that occur less than 20 documents, or more than 50% of the documents.
+        Parameters:
+        - no_below (float): Threshold for filtering infrequent words.
+        - no_above (float): Threshold for filtering highly frequent words.
+
+        Returns:
+        - None
+        """
+        self.dictionary = corpora.Dictionary(self.morphed_tokens)
         self.dictionary.filter_extremes(no_below=no_below, no_above=no_above)
 
     def _morphological_reduction(self, use_lemmatization=True):
+        """
+        Apply lemmatization or stemming to the tokens.
+
+        Parameters:
+        - use_lemmatization (bool): Use lemmatization if True, else use stemming.
+
+        Returns:
+        - None
+        """
+        real_words = set(words.words())
         if use_lemmatization:
-            # Lemmatize the tokens
             lemmatizer = WordNetLemmatizer()
             self.morphed_tokens = [[lemmatizer.lemmatize(
-                word) for word in doc] for doc in self.tokens]
+                word) for word in doc if word in real_words] for doc in self.tokens]
         else:
-            # Stem the tokens
             stemmer = PorterStemmer()
             self.morphed_tokens = [
                 [stemmer.stem(word) for word in doc] for doc in self.tokens]
 
     def _build_vocabulary(self):
-        # Build the vocabulary with optional stemming or lemmatization
+        """
+        Build the vocabulary
+
+        Returns:
+        - None
+        """
         all_tokens = self.morphed_tokens
         frequency = defaultdict(int)
 
@@ -70,71 +129,86 @@ class LexicalPreprocessing:
         self.vocabulary = list(frequency.keys())
 
     def _vector_representation(self, use_bow=True):
+        """
+        Generate vector representation of the documents using Bag of Words (BoW) or TF-IDF.
+
+        Parameters:
+        - use_bow (bool): Use Bag of Words if True, else use TF-IDF.
+
+        Returns:
+        - None
+        """
         corpus = [self.dictionary.doc2bow(doc) for doc in self.morphed_tokens]
         if use_bow:
-            # Using BoW representation
             self.vector_repr = corpus
         else:
-            # Using TF-IDF representation
             tfidf = models.TfidfModel(corpus)
             self.vector_repr = [tfidf[doc] for doc in corpus]
 
-    def _calculate_co_occurrence_matrix(self, window_size=2):
-        window_size = len(self.vocabulary)
-        # Flatten the list of tokenized documents
-        flat_documents = [token for doc in self.morphed_tokens for token in doc]
+    def _calculate_co_occurrence_matrix(self, corpus_name):
+        """
+        Calculate the co-occurrence matrix and save it to a file.
 
-        # Compute the frequency distribution of words
-        fdist = Counter(flat_documents)
+        Parameters:
+        - corpus_name (str): Name used for saving co-occurrence matrix.
 
-        # Initialize the co-occurrence dictionary
-        co_occurrence_dict = {word: {} for word in self.vocabulary}
+        Returns:
+        - dict: Co-occurrence matrix as a dictionary.
+        """
+        path = os.path.abspath('src') + '/co_occurrence_dicts/' + f'{corpus_name}.json'
+        if os.path.exists(path):
+            with open(path, 'r') as file:
+                self.co_occurrence_dict = json.load(file)
+        else:
+            corpus = [" ".join(doc) for doc in self.morphed_tokens]
 
-        # Iterate over each document
-        for doc in self.morphed_tokens:
-            # Iterate over each word in the document
-            for i, word in enumerate(doc):
-                # Get the context window around the current word
-                start = max(0, i - window_size)
-                end = min(len(doc), i + window_size + 1)
-                context = doc[start:end]
+            cv = CountVectorizer(ngram_range=(1, 1), stop_words='english')
+            X = cv.fit_transform(corpus)
+            Xc = (X.T * X)
+            Xc.setdiag(0)
+            Xc_normalized = normalize(Xc, norm='l2', axis=1)
+            names = cv.get_feature_names_out()
 
-                # Update co-occurrence counts
-                for context_word in context:
-                    if word != context_word and word in self.vocabulary and context_word in self.vocabulary:
-                        co_occurrence_dict[word][context_word] = co_occurrence_dict[word].get(context_word, 0) + 1
+            cooccurrence_dict = {}
+            for i, word in enumerate(names):
+                word_dict = {}
+                for j in range(len(names)):
+                    if Xc_normalized[i, j] > 0:
+                        word_dict[names[j]] = Xc_normalized[i, j]
+                cooccurrence_dict[word] = word_dict
 
-        # Normalize the co-occurrence dictionary
-        for word, context_dict in co_occurrence_dict.items():
-            total_word_frequency = fdist[word]
-            for context_word, count in context_dict.items():
-                co_occurrence_dict[word][context_word] = count / (total_word_frequency * fdist[context_word])
+            with open(path, 'w') as file:
+                json.dump(cooccurrence_dict, file)
 
-        return co_occurrence_dict
+            self.co_occurrence_dict = cooccurrence_dict
+            return cooccurrence_dict
 
     def __repr__(self) -> str:
-        # Get all attributes of the class as a dictionary and format them for printing
+        """
+        Get a string representation of the class attributes.
+
+        Returns:
+        - str: String representation of the class.
+        """
         attributes = vars(self)
         repr_str = "\n".join(f"{key}: {value}" for key,
                              value in attributes.items())
         return repr_str
 
 
-# Create a list of documents (each document is a list of words)
-documents = ["This is first creation the first document.", "This document is the second document.",
-             "And this is the third one.", "Is hola document laura victoria riera perez holita holiwis fuera this the first document?"]
 
-documents = ['dog, cat, rabbit', 
-            'egg, sugar, butter, flour, recipe, cake, dessert', 
-            'birthday, party, gift, music, candles, wish', 
-            'computer, program, development, web, application, data', 
-            'school, class, homework, student, book, knowledge, learn, teach']
+# # Create a list of documents (each document is a list of words)
+# documents = ["This is first creation the first document.", "This document is the second document.",
+#              "And this is the third one.", "Is hola document laura victoria riera perez holita holiwis fuera this the first document?"]
 
-# Initialize the LexicalPreprocessing class with your documents
-preprocessor = LexicalPreprocessing()
-preprocessor.preprocess_text(documents)
+# documents = ['kfhwluighwlr, dog, cat, rabbit', 
+#             'egg, sugar, butter, flour, recipe, cake, dessert', 
+#             'birthday, party, gift, music, candles, wish', 
+#             'computer, program, development, web, application, data', 
+#             'school, class, homework, student, book, knowledge, learn, teach']
 
-print(preprocessor)
+# # Initialize the LexicalPreprocessing class with your documents
+# preprocessor = LexicalPreprocessing()
+# preprocessor.preprocess_text(documents, 'test2')
 
-co_occurrence_matrix = preprocessor._calculate_co_occurrence_matrix()
-print(co_occurrence_matrix)
+# print(preprocessor)

@@ -22,7 +22,7 @@
 \RequirePackage{footmisc}
 \RequirePackage{csquotes}
 \RequirePackage[
-	style=apa,
+	style=ieee,
 	citestyle=authoryear,
   hyperref=true,
 	backref=true

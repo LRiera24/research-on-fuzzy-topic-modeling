@@ -4,7 +4,7 @@ import numpy as np
 import os
 from gensim.models import KeyedVectors
 from sklearn.metrics.pairwise import cosine_similarity
-from lesk_modified import lesk_embedding
+from word_sense_desambiguation.lesk_modified import lesk_embedding
 
 
 def calculate_weighted_score(context_synsets, information_content_corpus, embeddings_model):
@@ -69,28 +69,28 @@ def calculate_semantic_relevance(embeddings_model, synset, context_synsets):
     return semantic_relevance
 
 
-# Use an appropriate information content corpus
-information_content_corpus = wordnet_ic.ic('ic-brown.dat')
+# # Use an appropriate information content corpus
+# information_content_corpus = wordnet_ic.ic('ic-brown.dat')
 
-model_path = os.path.abspath('src')
-model_path += '/word2vec/GoogleNews-vectors-negative300.bin'
-embeddings_model = KeyedVectors.load_word2vec_format(model_path, binary=True)
+# model_path = os.path.abspath('src')
+# model_path += '/word2vec/GoogleNews-vectors-negative300.bin'
+# embeddings_model = KeyedVectors.load_word2vec_format(model_path, binary=True)
 
-# context = ['dog', 'cat', 'rabbit', 'pig', 'bird']
-# context = ['egg', 'sugar', 'butter', 'flour', 'recipe', 'cake', 'dessert']
-# context = ['birthday', 'party', 'gift', 'music', 'people', 'candles', 'wish']
-# context = ['computer', 'web', 'internet', 'network', 'communication']
-context = ['school', 'class', 'homework', 'student', 'book', 'knowledge', 'learn', 'teach']
+# # context = ['dog', 'cat', 'rabbit', 'pig', 'bird']
+# # context = ['egg', 'sugar', 'butter', 'flour', 'recipe', 'cake', 'dessert']
+# # context = ['birthday', 'party', 'gift', 'music', 'people', 'candles', 'wish']
+# # context = ['computer', 'web', 'internet', 'network', 'communication']
+# context = ['school', 'class', 'homework', 'student', 'book', 'knowledge', 'learn', 'teach']
 
-context_synsets = []
-for word in context:
-    print(word)
-    synsets = wordnet.synsets(word)
-    best_synset = lesk_embedding(
-        word, context, embeddings_model, synsets=synsets)
-    if best_synset:
-        context_synsets.append(best_synset)
+# context_synsets = []
+# for word in context:
+#     print(word)
+#     synsets = wordnet.synsets(word)
+#     best_synset = lesk_embedding(
+#         word, context, embeddings_model, synsets=synsets)
+#     if best_synset:
+#         context_synsets.append(best_synset)
 
-tags = calculate_weighted_score(
-    context_synsets, information_content_corpus, embeddings_model)
-print('CHOSEN TAGS', tags)
+# tags = calculate_weighted_score(
+#     context_synsets, information_content_corpus, embeddings_model)
+# print('CHOSEN TAGS', tags)
