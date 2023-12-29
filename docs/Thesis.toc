@@ -1,18 +1,23 @@
 \babel@toc {spanish}{}\relax 
 \contentsline {chapter}{Introducción}{1}{chapter*.8}%
 \contentsline {chapter}{\numberline {1}Marco Te\'orico - Conceptual}{6}{chapter.1}%
-\contentsline {section}{\numberline {1.1}Modelos de T\'opicos}{6}{section.1.1}%
-\contentsline {section}{\numberline {1.2}Ontolog\'ias}{6}{section.1.2}%
-\contentsline {chapter}{\numberline {2}Concepción y dise\~no de la solución}{7}{chapter.2}%
-\contentsline {section}{\numberline {2.1}Pre-procesamiento sem\'antico}{9}{section.2.1}%
-\contentsline {subsection}{\numberline {2.1.1}Pre-procesamiento l\'exico}{9}{subsection.2.1.1}%
-\contentsline {subsection}{\numberline {2.1.2}Identificación de la Cantidad de Tópicos}{10}{subsection.2.1.2}%
-\contentsline {subsection}{\numberline {2.1.3}Descubrimiento de t\'opicos}{12}{subsection.2.1.3}%
-\contentsline {subsection}{\numberline {2.1.4}Asignaci\'on de nombres a t\'opicos}{13}{subsection.2.1.4}%
-\contentsline {section}{\numberline {2.2}Recuperaci\'on por t\'opicos}{15}{section.2.2}%
-\contentsline {chapter}{\numberline {3}Implementación y Experimentaci\'on}{16}{chapter.3}%
-\contentsline {section}{\numberline {3.1}Implementación de la Metodología Propuesta}{16}{section.3.1}%
-\contentsline {section}{\numberline {3.2}Experimentaci\'on}{16}{section.3.2}%
-\contentsline {section}{\numberline {3.3}An\'alisis de Resultados}{16}{section.3.3}%
-\contentsline {chapter}{Conclusiones}{18}{section*.13}%
-\contentsline {chapter}{Recomendaciones}{19}{section*.15}%
+\contentsline {section}{\numberline {1.1}Modelos de T\'opicos}{7}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Ontolog\'ias}{9}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Vectores con contenido sem\'antico: \textit {embeddings}}{10}{section.1.3}%
+\contentsline {section}{\numberline {1.4}Estado del arte}{11}{section.1.4}%
+\contentsline {subsection}{\numberline {1.4.1}Estimaci\'on del n\'umero de t\'opicos presentes en un corpus}{11}{subsection.1.4.1}%
+\contentsline {subsection}{\numberline {1.4.2}Asignaci\'on de nombres a grupos}{12}{subsection.1.4.2}%
+\contentsline {subsubsection}{Desambiguaci\'on del sentido de las palabras}{12}{section*.9}%
+\contentsline {chapter}{\numberline {2}Concepción y dise\~no de la solución}{13}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Pre-procesamiento sem\'antico}{15}{section.2.1}%
+\contentsline {subsection}{\numberline {2.1.1}Pre-procesamiento l\'exico}{15}{subsection.2.1.1}%
+\contentsline {subsection}{\numberline {2.1.2}Identificación de la Cantidad de Tópicos}{16}{subsection.2.1.2}%
+\contentsline {subsection}{\numberline {2.1.3}Descubrimiento de t\'opicos}{18}{subsection.2.1.3}%
+\contentsline {subsection}{\numberline {2.1.4}Asignaci\'on de nombres a t\'opicos}{19}{subsection.2.1.4}%
+\contentsline {section}{\numberline {2.2}Recuperaci\'on por t\'opicos}{21}{section.2.2}%
+\contentsline {chapter}{\numberline {3}Implementación y Experimentaci\'on}{22}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Implementación de la Metodología Propuesta}{22}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Experimentaci\'on}{22}{section.3.2}%
+\contentsline {section}{\numberline {3.3}An\'alisis de Resultados}{22}{section.3.3}%
+\contentsline {chapter}{Conclusiones}{24}{section*.14}%
+\contentsline {chapter}{Recomendaciones}{25}{section*.16}%

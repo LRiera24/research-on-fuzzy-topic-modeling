@@ -44,7 +44,8 @@ class TopicNumberEstimation:
 
         print('Clusters')
         for t in cluster.clusters.values():
-            print(t[2])
+            if len(t[2]) > min_words_per_topic:
+                print(t[2])
         print()
 
         k = sum(1 for cluster_num in range(len(cluster.clusters)) 

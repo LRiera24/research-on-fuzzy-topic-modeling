@@ -132,7 +132,7 @@ class AutoIncrementalClustering:
             coherences.append(coherence)
 
         coherences = [(cluster_num, coherence) for cluster_num, coherence in zip(
-            self.clusters.keys(), coherences) if coherence >= 0.5]
+            self.clusters.keys(), coherences) if coherence >= 0.3]
 
         # print("coherences", coherences)
         return coherences

@@ -65,7 +65,7 @@ class LexicalPreprocessing:
         - None
         """
         self.tokens = [
-            [word.lower() for word in doc if word.isalpha() and len(word)>1] for doc in self.tokens]
+            [word.lower() for word in doc if word.isalpha()] for doc in self.tokens]
 
     def _remove_stopwords(self):
         """
@@ -78,7 +78,7 @@ class LexicalPreprocessing:
         self.tokens = [
             [word for word in doc if word not in stop_words] for doc in self.tokens]
 
-    def _filter_tokens_by_occurrence(self, no_below=0.1, no_above=0.5):
+    def _filter_tokens_by_occurrence(self, no_below=5, no_above=0.5):
         """
         Filter out infrequent and highly frequent words.
 
@@ -90,7 +90,14 @@ class LexicalPreprocessing:
         - None
         """
         self.dictionary = corpora.Dictionary(self.morphed_tokens)
+        print(len(self.dictionary))
         self.dictionary.filter_extremes(no_below=no_below, no_above=no_above)
+        print(len(self.dictionary))
+
+        filtered_words = [word for _, word in self.dictionary.iteritems()]
+
+        filtered_tokens = [[word for word in doc if word in filtered_words and len(word) > 2] for doc in self.morphed_tokens]
+        self.morphed_tokens = filtered_tokens
 
     def _morphological_reduction(self, use_lemmatization=True):
         """
@@ -106,7 +113,8 @@ class LexicalPreprocessing:
         if use_lemmatization:
             lemmatizer = WordNetLemmatizer()
             self.morphed_tokens = [[lemmatizer.lemmatize(
-                word) for word in doc if word in real_words] for doc in self.tokens]
+                word) for word in doc if lemmatizer.lemmatize(
+                word) in real_words] for doc in self.tokens]
         else:
             stemmer = PorterStemmer()
             self.morphed_tokens = [
@@ -127,6 +135,7 @@ class LexicalPreprocessing:
                 frequency[token] += 1
 
         self.vocabulary = list(frequency.keys())
+        print([w for w in self.vocabulary if len(w)<4])
 
     def _vector_representation(self, use_bow=True):
         """
@@ -171,6 +180,7 @@ class LexicalPreprocessing:
 
             cooccurrence_dict = {}
             for i, word in enumerate(names):
+                print(word)
                 word_dict = {}
                 for j in range(len(names)):
                     if Xc_normalized[i, j] > 0:
