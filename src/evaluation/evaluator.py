@@ -3,7 +3,6 @@ from sklearn.metrics import roc_curve, auc, cohen_kappa_score
 import resource
 import time
 
-
 class Evaluator:
     def __init__(self, ir_system_component):
         self.ir_system_component = ir_system_component

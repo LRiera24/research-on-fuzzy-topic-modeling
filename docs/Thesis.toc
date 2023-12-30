@@ -2,10 +2,10 @@
 \contentsline {chapter}{Introducción}{1}{chapter*.8}%
 \contentsline {chapter}{\numberline {1}Marco Te\'orico - Conceptual}{6}{chapter.1}%
 \contentsline {section}{\numberline {1.1}Modelos de T\'opicos}{7}{section.1.1}%
-\contentsline {section}{\numberline {1.2}Ontolog\'ias}{9}{section.1.2}%
-\contentsline {section}{\numberline {1.3}Vectores con contenido sem\'antico: \textit {embeddings}}{10}{section.1.3}%
-\contentsline {section}{\numberline {1.4}Estado del arte}{11}{section.1.4}%
-\contentsline {subsection}{\numberline {1.4.1}Estimaci\'on del n\'umero de t\'opicos presentes en un corpus}{11}{subsection.1.4.1}%
+\contentsline {section}{\numberline {1.2}Ontolog\'ias}{8}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Vectores con contenido sem\'antico: \textit {embeddings}}{9}{section.1.3}%
+\contentsline {section}{\numberline {1.4}Estado del arte}{10}{section.1.4}%
+\contentsline {subsection}{\numberline {1.4.1}Identificación del n\'umero de t\'opicos presentes en un corpus}{10}{subsection.1.4.1}%
 \contentsline {subsection}{\numberline {1.4.2}Asignaci\'on de nombres a grupos}{12}{subsection.1.4.2}%
 \contentsline {subsubsection}{Desambiguaci\'on del sentido de las palabras}{13}{section*.9}%
 \contentsline {chapter}{\numberline {2}Concepción y dise\~no de la solución}{15}{chapter.2}%

@@ -29,7 +29,7 @@ class AutoIncrementalClustering:
         clusters (dict): Dictionary to store the clusters.
         pairwise_similarities (dict): Stores pairwise similarities (unused in current implementation).
     """
-    def __init__(self, words, occurrences, word_embeddings, model, min_coherence=0.4):
+    def __init__(self, words, occurrences, word_embeddings, model, min_similarity=0.4):
         """
         Initializes the AutoIncrementalClustering class.
 
@@ -43,7 +43,7 @@ class AutoIncrementalClustering:
         self.words = words
         self.occurrences = occurrences
         self.word_embeddings = word_embeddings
-        self.min_similarity = min_coherence
+        self.min_similarity = min_similarity
         self.model = model
         self.clusters = {}
         self.pairwise_similarities = {}
@@ -165,24 +165,3 @@ class AutoIncrementalClustering:
                 self.clusters[cluster_num][CENTROID] = new_centroid
                 self.clusters[cluster_num][ELEMENTS] = updated_elements
                 self.clusters[cluster_num][WORDS].append(self.words[index])
-
-# # Load pre-trained word embeddings (Word2Vec model)
-# model_path = os.path.abspath('src')
-# model_path += '/word2vec/GoogleNews-vectors-negative300.bin'
-# word2vec_model = KeyedVectors.load_word2vec_format(model_path, binary=True)
-
-# context = ['dog', 'cat', 'rabbit']
-# context = ['egg', 'sugar', 'butter', 'flour', 'recipe', 'cake', 'dessert']
-# context = ['birthday', 'party', 'gift', 'music', 'candles', 'wish']
-# context = ['computer', 'program', 'development', 'web', 'application', 'data']
-# context = ['school', 'life', 'class', 'homework', 'student', 'book', 'knowledge', 'learn', 'teach', 'dog', 'cat', 'rabbit',
-#             'egg', 'sugar', 'butter', 'flour', 'recipe', 'cake', 'dessert', 'birthday', 'party', 'gift', 'music', 
-#             'candle', 'wish', 'computer', 'program', 'development', 'web', 'application', 'data']
-
-# occurrence = {'life': {}, 'dog': {'cat': 1.0, 'rabbit': 1.0}, 'cat': {'dog': 1.0, 'rabbit': 1.0}, 'rabbit': {'dog': 1.0, 'cat': 1.0}, 'egg': {'sugar': 1.0, 'butter': 1.0, 'flour': 1.0, 'recipe': 1.0, 'cake': 1.0, 'dessert': 1.0}, 'sugar': {'egg': 1.0, 'butter': 1.0, 'flour': 1.0, 'recipe': 1.0, 'cake': 1.0, 'dessert': 1.0}, 'butter': {'egg': 1.0, 'sugar': 1.0, 'flour': 1.0, 'recipe': 1.0, 'cake': 1.0, 'dessert': 1.0}, 'flour': {'egg': 1.0, 'sugar': 1.0, 'butter': 1.0, 'recipe': 1.0, 'cake': 1.0, 'dessert': 1.0}, 'recipe': {'egg': 1.0, 'sugar': 1.0, 'butter': 1.0, 'flour': 1.0, 'cake': 1.0, 'dessert': 1.0}, 'cake': {'egg': 1.0, 'sugar': 1.0, 'butter': 1.0, 'flour': 1.0, 'recipe': 1.0, 'dessert': 1.0}, 'dessert': {'egg': 1.0, 'sugar': 1.0, 'butter': 1.0, 'flour': 1.0, 'recipe': 1.0, 'cake': 1.0}, 'birthday': {'party': 1.0, 'gift': 1.0, 'music': 1.0, 'candle': 1.0, 'wish': 1.0}, 'party': {'birthday': 1.0, 'gift': 1.0, 'music': 1.0, 'candle': 1.0, 'wish': 1.0}, 'gift': {'birthday': 1.0, 'party': 1.0, 'music': 1.0, 'candle': 1.0, 'wish': 1.0}, 'music': {'birthday': 1.0, 'party': 1.0, 'gift': 1.0, 'candle': 1.0, 'wish': 1.0}, 'candle': {'birthday': 1.0, 'party': 1.0, 'gift': 1.0, 'music': 1.0, 'wish': 1.0}, 'wish': {'birthday': 1.0, 'party': 1.0, 'gift': 1.0, 'music': 1.0, 'candle': 1.0}, 'computer': {'program': 1.0, 'development': 1.0, 'web': 1.0, 'application': 1.0, 'data': 1.0}, 'program': {'computer': 1.0, 'development': 1.0, 'web': 1.0, 'application': 1.0, 'data': 1.0}, 'development': {'computer': 1.0, 'program': 1.0, 'web': 1.0, 'application': 1.0, 'data': 1.0}, 'web': {'computer': 1.0, 'program': 1.0, 'development': 1.0, 'application': 1.0, 'data': 1.0}, 'application': {'computer': 1.0, 'program': 1.0, 'development': 1.0, 'web': 1.0, 'data': 1.0}, 'data': {'computer': 1.0, 'program': 1.0, 'development': 1.0, 'web': 1.0, 'application': 1.0}, 'school': {'class': 1.0, 'homework': 1.0, 'student': 1.0, 'book': 1.0, 'knowledge': 1.0, 'learn': 1.0, 'teach': 1.0}, 'class': {'school': 1.0, 'homework': 1.0, 'student': 1.0, 'book': 1.0, 'knowledge': 1.0, 'learn': 1.0, 'teach': 1.0}, 'homework': {'school': 1.0, 'class': 1.0, 'student': 1.0, 'book': 1.0, 'knowledge': 1.0, 'learn': 1.0, 'teach': 1.0}, 'student': {'school': 1.0, 'class': 1.0, 'homework': 1.0, 'book': 1.0, 'knowledge': 1.0, 'learn': 1.0, 'teach': 1.0}, 'book': {'school': 1.0, 'class': 1.0, 'homework': 1.0, 'student': 1.0, 'knowledge': 1.0, 'learn': 1.0, 'teach': 1.0}, 'knowledge': {'school': 1.0, 'class': 1.0, 'homework': 1.0, 'student': 1.0, 'book': 1.0, 'learn': 1.0, 'teach': 1.0}, 'learn': {'school': 1.0, 'class': 1.0, 'homework': 1.0, 'student': 1.0, 'book': 1.0, 'knowledge': 1.0, 'teach': 1.0}, 'teach': {'school': 1.0, 'class': 1.0, 'homework': 1.0, 'student': 1.0, 'book': 1.0, 'knowledge': 1.0, 'learn': 1.0}}
-# embeddings = [word2vec_model[word] for word in context]
-
-# cluster = AutoIncrementalClustering(context, occurrence, embeddings, word2vec_model)
-# cluster.clustering()
-# # for t in cluster.clusters.values():
-# #     print(t[WORDS])
