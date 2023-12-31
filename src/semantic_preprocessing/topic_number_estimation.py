@@ -1,5 +1,6 @@
 from gensim.models import KeyedVectors
 import numpy as np
+from nltk import pos_tag
 from semantic_preprocessing.auto_incremental_clustering import AutoIncrementalClustering
 
 class TopicNumberEstimation:
@@ -13,7 +14,7 @@ class TopicNumberEstimation:
 
     ELEMENTS = 1  # Used as an index for cluster elements
 
-    def __init__(self, vocabulary, embeddings_model):
+    def __init__(self, embeddings_model):
         """
         Initializes the TopicNumberEstimation class with the given vocabulary and embeddings model.
 
@@ -21,12 +22,11 @@ class TopicNumberEstimation:
             vocabulary (list): A list of words in the dataset.
             embeddings_model (KeyedVectors): A pre-trained word embeddings model.
         """
-        self.vocabulary = vocabulary
         self.model = embeddings_model
         self.embedding_dim = self.model.vector_size
         self.word_embeddings = []
 
-    def estimate_topic_number(self, co_occurrence_matrix, min_words_per_topic=20):
+    def estimate_topic_number(self, vocabulary, co_occurrence_matrix, min_sim, min_coh, min_words_per_topic):
         """
         Estimates the number of topics using a clustering algorithm.
 
@@ -37,26 +37,29 @@ class TopicNumberEstimation:
         Returns:
             int: Estimated number of topics.
         """
-        self._get_word_embeddings()
+        tagged = pos_tag(vocabulary)
+        nouns_verbs = [word for word, tag in tagged if tag.startswith('NN') or tag.startswith('VB')]
 
-        cluster = AutoIncrementalClustering(self.vocabulary, co_occurrence_matrix, self.word_embeddings, self.model)
+        self._get_word_embeddings(nouns_verbs)
+
+        cluster = AutoIncrementalClustering(nouns_verbs, co_occurrence_matrix, self.word_embeddings, self.model, min_sim, min_coh)
         cluster.clustering()
 
+        clusters = []
         print('Clusters')
         for t in cluster.clusters.values():
-            if len(t[2]) > min_words_per_topic:
+            if len(t[2]) >= min_words_per_topic:
                 print(t[2])
+                clusters.append(t[2])
         print()
 
-        k = sum(1 for cluster_num in range(len(cluster.clusters)) 
-                if len(cluster.clusters[cluster_num][self.ELEMENTS]) >= min_words_per_topic)
-        return k
+        return len(clusters), clusters
 
-    def _get_word_embeddings(self):
+    def _get_word_embeddings(self, vocabulary):
         """
         Retrieves word embeddings for the given vocabulary from the embeddings model.
         """
-        for word in self.vocabulary:
+        for word in vocabulary:
             if word in self.model:
                 vector = self.model[word]
             else:

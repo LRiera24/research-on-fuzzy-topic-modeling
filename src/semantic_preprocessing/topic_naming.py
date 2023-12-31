@@ -32,6 +32,8 @@ class TopicNaming:
         self.information_content_corpus = information_content_corpus
         self.embeddings_model = embeddings_model
         self.domains = []
+        self.chosen_defs = []
+        self.top_words = []
 
     def tag_topics(self):
         """
@@ -39,7 +41,9 @@ class TopicNaming:
         """
         for topic_num in range(self.topic_model.num_topics):
             top_words = self.get_top_words(topic_num, 3)
+            self.top_words.append(top_words)
             synsets = self.get_definitions_for_context(top_words)
+            self.chosen_defs.append(synsets)
             self.domains.append((topic_num, self.calculate_max_weighted_score(synsets)))
 
     def get_top_words(self, topic_num, k):

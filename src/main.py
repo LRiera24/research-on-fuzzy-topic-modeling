@@ -6,20 +6,13 @@ from semantic_preprocessing.topic_discovery import TopicDiscovery
 from semantic_preprocessing.topic_naming import TopicNaming
 from nltk.corpus import wordnet_ic
 from sklearn.datasets import fetch_20newsgroups
+from semantic_classsification import semantic_classification
 
 # Load the 20 Newsgroups dataset
 newsgroups = fetch_20newsgroups(subset='all', remove=('headers', 'footers', 'quotes'))
 
 # Preprocess the text data
 corpus = newsgroups.data
-
-# Load pre-trained word embeddings (Word2Vec model)
-model_path = os.path.abspath('src')
-model_path += '/word2vec/GoogleNews-vectors-negative300.bin'
-word2vec_model = KeyedVectors.load_word2vec_format(model_path, binary=True)
-
-# Load pre-trained information content corpus
-information_content_corpus = wordnet_ic.ic('ic-brown.dat')
 
 # corpus = ['dog, cat, rabbit',
 #             'egg, sugar, butter, flour, recipe, cake, dessert',
@@ -29,22 +22,15 @@ information_content_corpus = wordnet_ic.ic('ic-brown.dat')
 #             'computer, program, development, web, application, data',
 #             'school, class, homework, student, book, knowledge, learn, teach']
 
-preprocesser = LexicalPreprocessing()
-preprocesser.preprocess_text(corpus, '20newsgroups')
+corpus_name = '20newsgroups'
 
-estimator = TopicNumberEstimation(preprocesser.vocabulary, word2vec_model)
-k = estimator.estimate_topic_number(preprocesser.co_occurrence_dict)
+real_k = 20
 
-print("Estimated number of topics:", k)
+real_tags = []
 
-# topic_finder = TopicDiscovery(preprocesser.vector_repr, preprocesser.dictionary, k)
-# topic_model = topic_finder.train_lda()
-# topics = topic_finder.get_topics(topic_model)
-# print(topics)
+s = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+c = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 
-# tagger = TopicNaming(topic_model, information_content_corpus, word2vec_model)
-# tagger.tag_topics()
-# print("Tags:", tagger.domains)
-
-
-
+for sim in s:
+    for coh in c:
+        semantic_classification(corpus, corpus_name, real_k, real_tags, min_sim=sim, min_coh=coh)

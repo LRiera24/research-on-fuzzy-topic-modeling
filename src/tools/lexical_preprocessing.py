@@ -90,9 +90,7 @@ class LexicalPreprocessing:
         - None
         """
         self.dictionary = corpora.Dictionary(self.morphed_tokens)
-        print(len(self.dictionary))
         self.dictionary.filter_extremes(no_below=no_below, no_above=no_above)
-        print(len(self.dictionary))
 
         filtered_words = [word for _, word in self.dictionary.iteritems()]
 
@@ -135,7 +133,6 @@ class LexicalPreprocessing:
                 frequency[token] += 1
 
         self.vocabulary = list(frequency.keys())
-        print([w for w in self.vocabulary if len(w)<4])
 
     def _vector_representation(self, use_bow=True):
         """
@@ -164,7 +161,11 @@ class LexicalPreprocessing:
         Returns:
         - dict: Co-occurrence matrix as a dictionary.
         """
-        path = os.path.abspath('src') + '/co_occurrence_dicts/' + f'{corpus_name}.json'
+        path = os.path.abspath('src') + '/co_occurrence_dicts'
+        if not os.path.exists(path):
+            os.makedirs(path)
+        path += f'/{corpus_name}.json'
+        
         if os.path.exists(path):
             with open(path, 'r') as file:
                 self.co_occurrence_dict = json.load(file)
@@ -204,21 +205,3 @@ class LexicalPreprocessing:
         repr_str = "\n".join(f"{key}: {value}" for key,
                              value in attributes.items())
         return repr_str
-
-
-
-# # Create a list of documents (each document is a list of words)
-# documents = ["This is first creation the first document.", "This document is the second document.",
-#              "And this is the third one.", "Is hola document laura victoria riera perez holita holiwis fuera this the first document?"]
-
-# documents = ['kfhwluighwlr, dog, cat, rabbit', 
-#             'egg, sugar, butter, flour, recipe, cake, dessert', 
-#             'birthday, party, gift, music, candles, wish', 
-#             'computer, program, development, web, application, data', 
-#             'school, class, homework, student, book, knowledge, learn, teach']
-
-# # Initialize the LexicalPreprocessing class with your documents
-# preprocessor = LexicalPreprocessing()
-# preprocessor.preprocess_text(documents, 'test2')
-
-# print(preprocessor)

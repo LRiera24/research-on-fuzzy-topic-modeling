@@ -29,7 +29,7 @@ class AutoIncrementalClustering:
         clusters (dict): Dictionary to store the clusters.
         pairwise_similarities (dict): Stores pairwise similarities (unused in current implementation).
     """
-    def __init__(self, words, occurrences, word_embeddings, model, min_similarity=0.4):
+    def __init__(self, words, occurrences, word_embeddings, model, min_similarity, min_coherence):
         """
         Initializes the AutoIncrementalClustering class.
 
@@ -44,6 +44,7 @@ class AutoIncrementalClustering:
         self.occurrences = occurrences
         self.word_embeddings = word_embeddings
         self.min_similarity = min_similarity
+        self.min_coherence = min_coherence
         self.model = model
         self.clusters = {}
         self.pairwise_similarities = {}
@@ -59,7 +60,7 @@ class AutoIncrementalClustering:
         for index, w_embedding in enumerate(self.word_embeddings):
             # print("!!!!!!!!!!!!!", all(w_embedding) != None)
             if len(self.clusters) == 0:
-                self._assignment(index, w_embedding, None, None)
+                self._assignment(index, w_embedding, None)
                 # print("FIRST ELEMENT ADDED")
                 continue
             similarities = self._calculate_similarities(w_embedding)
@@ -67,7 +68,7 @@ class AutoIncrementalClustering:
             try:
                 coherences = self._evaluate_coherence(self.words[index], similarities)
                 # print("!!!!!!!!!!!!!!! QUALITY DONE")
-                self._assignment(index, w_embedding, similarities, coherences)
+                self._assignment(index, w_embedding, coherences)
                 # print("!!!!!!!!!!!!!!! ASSIGNMENT DONE")
                 # for a in self.clusters.values():
                 #     print(a[2])
@@ -132,12 +133,12 @@ class AutoIncrementalClustering:
             coherences.append(coherence)
 
         coherences = [(cluster_num, coherence) for cluster_num, coherence in zip(
-            self.clusters.keys(), coherences) if coherence >= 0.3]
+            self.clusters.keys(), coherences) if coherence >= self.min_coherence]
 
         # print("coherences", coherences)
         return coherences
 
-    def _assignment(self, index, word_embedding, similarities, coherences):
+    def _assignment(self, index, word_embedding, coherences):
         """
         Assign the word embedding to an existing or new cluster.
 
@@ -148,16 +149,17 @@ class AutoIncrementalClustering:
             coherences (list of tuples): Cluster coherences.
         """
 
-        common_clusters = set(index1 for index1, _ in similarities) & set(
-            index2 for index2, _ in coherences) if similarities and coherences else []
+        indexes = []
+        if coherences:
+            indexes = [index for index, _ in coherences]
 
-        if len(self.clusters) == 0 or len(common_clusters) == 0:
+        if len(self.clusters) == 0 or len(indexes) == 0:
             # print('assignment')
             # If no clusters exist or there are no common clusters, create a new cluster.
             self.clusters[len(self.clusters)] = [
                 word_embedding, [word_embedding], [self.words[index]]]
         else:
-            for cluster_num in common_clusters:
+            for cluster_num in indexes:
                 # Update an existing cluster with the new word embedding.
                 self.clusters[cluster_num][ELEMENTS].append(word_embedding)
                 updated_elements = self.clusters[cluster_num][ELEMENTS]
