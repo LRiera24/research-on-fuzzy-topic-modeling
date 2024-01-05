@@ -1,19 +1,10 @@
-import nltk
-from nltk.tokenize import word_tokenize
-from nltk import pos_tag
+from nltk.corpus import wordnet as wn
 
-nltk.download('averaged_perceptron_tagger')
+# Let's take a synset for the word "dog"
+dog_synset = wn.synsets('dog')[0]  # taking the first synset for demonstration
 
-# Sample text
-text = "The quick brown fox jumps over the lazy dog."
+# Using str() to get string representation
+print(str(dog_synset))
 
-# Tokenize the text
-tokens = word_tokenize(text)
-
-# Perform POS tagging
-tagged = pos_tag(tokens)
-
-# Filter out nouns and verbs
-nouns_verbs = [word for word, tag in tagged if tag.startswith('NN') or tag.startswith('VB')]
-
-print(nouns_verbs)
+# Using the name() method
+print(dog_synset.name())

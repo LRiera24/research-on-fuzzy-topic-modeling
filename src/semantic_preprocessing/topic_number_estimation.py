@@ -38,7 +38,7 @@ class TopicNumberEstimation:
             int: Estimated number of topics.
         """
         tagged = pos_tag(vocabulary)
-        nouns_verbs = [word for word, tag in tagged if tag.startswith('NN') or tag.startswith('VB')]
+        nouns_verbs = [word for word, tag in tagged if tag.startswith('NN') and tag != 'NNP' and tag != 'NNPS']
 
         self._get_word_embeddings(nouns_verbs)
 

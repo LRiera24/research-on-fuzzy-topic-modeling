@@ -158,6 +158,9 @@ cython_debug/
 # Wikipedia Dump 2023
 *.xml
 
+# Reuters corpus
+*.sgm
+
 # Co-occurrence matrices
 *.json
 

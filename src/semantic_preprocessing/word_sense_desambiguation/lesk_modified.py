@@ -15,7 +15,7 @@ from math import inf
 # model_path += '/word2vec/GoogleNews-vectors-negative300.bin'
 # print(model_path)
 
-# Load pre-trained word embeddings (Word2Vec model)
+# # Load pre-trained word embeddings (Word2Vec model)
 # word2vec_model = KeyedVectors.load_word2vec_format(model_path, binary=True)
 
 def lesk_embedding(word, context, model, synsets=None):
@@ -30,17 +30,20 @@ def lesk_embedding(word, context, model, synsets=None):
     # print(important_terms)
 
     context_embedding = np.mean([model[word] for word in context if word in model], axis=0)
-
     best_synset = None
     max_similarity = float('-inf')
 
     for synset in synsets:
         if synset.pos() != 'v':
-            definition_embedding = np.mean([model[word] for word in word_tokenize(synset.definition()) if word in model and word in important_terms], axis=0)
-            
+            def_emb = [model[word] for word in word_tokenize(synset.definition()) if word in model and word in important_terms]
+            if len(def_emb) == 0:
+                continue
+
+            definition_embedding = np.mean(def_emb, axis=0)
+
             if definition_embedding is not None:
                 similarity = np.dot(context_embedding, definition_embedding) / (np.linalg.norm(context_embedding) * np.linalg.norm(definition_embedding))
-
+                
                 if similarity > max_similarity:
                     max_similarity = similarity
                     best_synset = synset
@@ -80,6 +83,7 @@ def hyper(s): return s.hypernyms()
 # context = ['birthday', 'party', 'gift', 'music', 'candles', 'wish']
 # context = ['computer', 'program', 'development', 'application', 'web', 'data']
 # context = ['school', 'student', 'book', 'teacher']
+# context = ['year', 'game', 'last', 'get', 'bike', 'good', 'time', 'got', 'run', 'hit']
 # chosen_defs = []
 
 # lemmas = {}
@@ -95,16 +99,6 @@ def hyper(s): return s.hypernyms()
 #         print("Definition:", best_synset.definition())
 #         print("Attributes:", best_synset.entailments())
 #         print('Lemmas', [w.lemma_names() for w in list(best_synset.closure(hyper)) if w.min_depth() > 5])
-#         # sum = 0
-#         # c = 0
-#         # for w in list(best_synset.closure(hyper)): 
-#         #     d = w.min_depth()
-#         #     if d > 3:
-#         #         sum += w.min_depth()
-#         #         c += 1
-#         # mean = round(sum / c)
-#         # print('mean', mean)
-#         # print(sum/c)
         
 #         chosen_defs.append(best_synset)
 #     else:
@@ -113,45 +107,3 @@ def hyper(s): return s.hypernyms()
 #     print()
 
 # print(chosen_defs)
-# # min = inf
-# # for cd in chosen_defs:
-# #     d = cd.min_depth()
-# #     if d < min:
-# #         min = d
-# #     print(d)
-# # print('min', min)
-
-# sum = 0
-# c = 0
-# # for cd in chosen_defs:
-# #     d = cd.min_depth()
-# #     sum += d
-# #     c += 1
-# #     print(d)
-# # mean = sum / c
-# # print('mean', mean)
-
-# for s in chosen_defs:
-#     for w in list(s.closure(hyper)): 
-#                     # print(w)
-#                     d = w.min_depth()
-#                     # print(d, mean)
-#                     if 3 < d:
-#                         lemmas[w] = lemmas.get(w, 0) + 1 
-#                         if lemmas['MAX_OCCURRENCE'] < lemmas[w]:
-#                             lemmas['MAX_OCCURRENCE'] = lemmas[w]
-
-# print(lemmas)
-# print('CHOSEN TAGS')
-# for l in lemmas.keys():
-#     try:    
-#         if lemmas[l] == lemmas['MAX_OCCURRENCE']:
-#             d = l.min_depth()
-#             sum += d
-#             c += 1
-#             print(l, d)
-#     except:
-#         pass
-
-# mean = round(sum / c)
-# print('mean', mean)

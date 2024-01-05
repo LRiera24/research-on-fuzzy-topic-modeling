@@ -40,11 +40,13 @@ class TopicNaming:
         Assigns a name to each topic based on the lowest common domain among its top words.
         """
         for topic_num in range(self.topic_model.num_topics):
-            top_words = self.get_top_words(topic_num, 3)
+            top_words = self.get_top_words(topic_num, 10)
             self.top_words.append(top_words)
             synsets = self.get_definitions_for_context(top_words)
             self.chosen_defs.append(synsets)
-            self.domains.append((topic_num, self.calculate_max_weighted_score(synsets)))
+            doms = (topic_num, self.calculate_max_weighted_score(synsets))
+            print("Chosen tags:", doms)
+            self.domains.append(doms)
 
     def get_top_words(self, topic_num, k):
         """
@@ -146,7 +148,7 @@ class TopicNaming:
             semantic_relevance_weight = self.calculate_semantic_relevance(synset, context_synsets)
             frequency_weight = candidate_tags[synset]
             combined_weights.append(
-                np.mean([information_content, semantic_relevance_weight, frequency_weight]))
+                np.mean([0.2 * information_content, 0.2 * specificity_weight, 0.5 * semantic_relevance_weight, 0.1 * frequency_weight]))
 
         max_value = max(combined_weights)
         max_indices = [i for i, x in enumerate(combined_weights) if max_value - x <= 0.01]

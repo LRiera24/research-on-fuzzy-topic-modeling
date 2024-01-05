@@ -96,7 +96,6 @@ class AutoIncrementalClustering:
             similarities.append((index, similarity))
 
         # Calculate harmonic mean of similarities and filter clusters based on a threshold.
-        harmonic_mean = hmean([sim for _, sim in similarities if sim >= 0])
         similarities = [(cluster_num, similarity) for cluster_num,
                         similarity in similarities if similarity >= self.min_similarity]
 
@@ -163,7 +162,10 @@ class AutoIncrementalClustering:
                 # Update an existing cluster with the new word embedding.
                 self.clusters[cluster_num][ELEMENTS].append(word_embedding)
                 updated_elements = self.clusters[cluster_num][ELEMENTS]
+                print(self.clusters[cluster_num][CENTROID])
+                print(word_embedding)
                 new_centroid = np.mean(updated_elements, axis=0)
+                print(new_centroid)
                 self.clusters[cluster_num][CENTROID] = new_centroid
                 self.clusters[cluster_num][ELEMENTS] = updated_elements
                 self.clusters[cluster_num][WORDS].append(self.words[index])
