@@ -3,6 +3,7 @@ import numpy as np
 from semantic_preprocessing.word_sense_desambiguation.genetic_algorithm import genetic_algorithm
 from semantic_preprocessing.word_sense_desambiguation.simplex import simplex_sol
 from semantic_preprocessing.word_sense_desambiguation.lesk_modified import lesk_embedding
+import nltk
 
 class TopicNaming:
     """
@@ -40,7 +41,7 @@ class TopicNaming:
         Assigns a name to each topic based on the lowest common domain among its top words.
         """
         for topic_num in range(self.topic_model.num_topics):
-            top_words = self.get_top_words(topic_num, 10)
+            top_words = self.get_top_words(topic_num, 30)
             self.top_words.append(top_words)
             synsets = self.get_definitions_for_context(top_words)
             self.chosen_defs.append(synsets)
@@ -61,9 +62,22 @@ class TopicNaming:
         """
         topic_words = self.topic_model.show_topic(topic_num, topn=k)
         topic_words = sorted(topic_words, key=lambda x: x[1], reverse=True)
-        top_words = [word for word, prob in topic_words[:k]]
+        # top_words = [word for word, prob in topic_words[:k]]
+
+        # Extract just the words
+        words = [word for word, _ in topic_words]
+
+        # Perform POS tagging
+        tagged_words = nltk.pos_tag(words)
+
+        # Filter out verbs (tags starting with 'VB')
+        non_verb_words = [word for word, tag in tagged_words if tag.startswith('NN')]
+
+        # Select the first k non-verb words
+        top_words = non_verb_words[:k]
         print(f"Top words for topic {topic_num}: {top_words}")
         return top_words
+
     # def get_top_words(self, topic_num, k):
     #     """
     #     Retrieves the most probable words for a specified topic, filtered by a significant drop in probabilities.
@@ -144,14 +158,14 @@ class TopicNaming:
         combined_weights = []
         for synset in candidate_tags.keys():
             information_content = self.information_content_corpus.get(synset.name(), 0.0)
-            specificity_weight = 1 / (1 + synset.min_depth())
+            specificity_weight = synset.min_depth()
             semantic_relevance_weight = self.calculate_semantic_relevance(synset, context_synsets)
             frequency_weight = candidate_tags[synset]
             combined_weights.append(
-                np.mean([0.2 * information_content, 0.2 * specificity_weight, 0.5 * semantic_relevance_weight, 0.1 * frequency_weight]))
+            np.mean([0.25 * information_content, 0.15 * specificity_weight, 0.5 * semantic_relevance_weight, 0.1 * frequency_weight]))
 
         max_value = max(combined_weights)
-        max_indices = [i for i, x in enumerate(combined_weights) if max_value - x <= 0.01]
+        max_indices = [i for i, x in enumerate(combined_weights) if max_value - x <= 0.001]
 
         return [s for index, s in enumerate(candidate_tags.keys()) if index in max_indices], round(max_value, 2)
 

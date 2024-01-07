@@ -28,4 +28,5 @@ def plot_heatmap(test_results):
     plt.xlabel('Valores de Similitud')
     plt.ylabel('Valores de Coherencia')
     plt.title('Mapa de Calor de Frecuencia de Aciertos Promedio')
+    plt.savefig('heatmap')
     plt.show()

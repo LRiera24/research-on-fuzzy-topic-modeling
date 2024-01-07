@@ -47,7 +47,6 @@ class AutoIncrementalClustering:
         self.min_coherence = min_coherence
         self.model = model
         self.clusters = {}
-        self.pairwise_similarities = {}
 
     def clustering(self):
         """

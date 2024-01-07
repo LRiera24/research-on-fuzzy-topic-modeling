@@ -9,6 +9,7 @@ import os
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.preprocessing import normalize
 
+
 class LexicalPreprocessing:
     """
     Class for performing lexical preprocessing on a collection of text documents.
@@ -24,6 +25,7 @@ class LexicalPreprocessing:
         self.vector_repr = None  # Vector representation of the documents
         self.dictionary = None  # Represents a Gensim Dictionary
         self.co_occurrence_dict = None  # Co-ocurrence matrix of the corpus
+        self.words_tfidf = None
 
     def preprocess_text(self, documents, name):
         """
@@ -94,7 +96,8 @@ class LexicalPreprocessing:
 
         filtered_words = [word for _, word in self.dictionary.iteritems()]
 
-        filtered_tokens = [[word for word in doc if word in filtered_words and len(word) > 2] for doc in self.morphed_tokens]
+        filtered_tokens = [[word for word in doc if word in filtered_words and len(
+            word) > 2] for doc in self.morphed_tokens]
         self.morphed_tokens = filtered_tokens
 
     def _morphological_reduction(self, use_lemmatization=True):
@@ -134,7 +137,7 @@ class LexicalPreprocessing:
 
         self.vocabulary = list(frequency.keys())
 
-    def _vector_representation(self, use_bow=True):
+    def _vector_representation(self, use_bow=False):
         """
         Generate vector representation of the documents using Bag of Words (BoW) or TF-IDF.
 
@@ -151,6 +154,13 @@ class LexicalPreprocessing:
             tfidf = models.TfidfModel(corpus)
             self.vector_repr = [tfidf[doc] for doc in corpus]
 
+            word_tfidf = {self.dictionary[id]
+                : 0 for id in self.dictionary.keys()}
+            for doc in tfidf[corpus]:
+                for id, score in doc:
+                    word_tfidf[self.dictionary[id]] += score
+            self.words_tfidf = word_tfidf
+
     def _calculate_co_occurrence_matrix(self, corpus_name):
         """
         Calculate the co-occurrence matrix and save it to a file.
@@ -165,7 +175,7 @@ class LexicalPreprocessing:
         if not os.path.exists(path):
             os.makedirs(path)
         path += f'/{corpus_name}.json'
-        
+
         if os.path.exists(path):
             with open(path, 'r') as file:
                 self.co_occurrence_dict = json.load(file)

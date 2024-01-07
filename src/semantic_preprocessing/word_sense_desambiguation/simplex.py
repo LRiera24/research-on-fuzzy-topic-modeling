@@ -52,9 +52,6 @@ def solve_optimization_problem(problem):
     problem.solve()
     return problem
 
-# Define your custom distance function
-
-
 def custom_distance_function(i, j, i_prime, j_prime, synsets, calculated_distances):
     synset1 = synsets[i-1][j-1]
     synset2 = synsets[i_prime-1][j_prime-1]

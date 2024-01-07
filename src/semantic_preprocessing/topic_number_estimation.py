@@ -38,11 +38,11 @@ class TopicNumberEstimation:
             int: Estimated number of topics.
         """
         tagged = pos_tag(vocabulary)
-        nouns_verbs = [word for word, tag in tagged if tag.startswith('NN') and tag != 'NNP' and tag != 'NNPS']
+        nouns = [word for word, tag in tagged if tag.startswith('NN') and tag != 'NNP' and tag != 'NNPS']
 
-        self._get_word_embeddings(nouns_verbs)
+        nouns = self._get_word_embeddings(nouns)
 
-        cluster = AutoIncrementalClustering(nouns_verbs, co_occurrence_matrix, self.word_embeddings, self.model, min_sim, min_coh)
+        cluster = AutoIncrementalClustering(nouns, co_occurrence_matrix, self.word_embeddings, self.model, min_sim, min_coh)
         cluster.clustering()
 
         clusters = []
@@ -59,9 +59,10 @@ class TopicNumberEstimation:
         """
         Retrieves word embeddings for the given vocabulary from the embeddings model.
         """
+        words = []
         for word in vocabulary:
             if word in self.model:
                 vector = self.model[word]
-            else:
-                vector = np.zeros(self.embedding_dim)
-            self.word_embeddings.append(vector)
+                self.word_embeddings.append(vector)
+                words.append(word)
+        return words

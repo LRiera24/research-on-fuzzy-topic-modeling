@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def plot_scatter(success_matrix):
+def plot_scatter(success_matrix, name=''):
     """
     Plot a scatter plot for each pair of coherence and similarity values,
     differentiating successes (with cross markers) and failures.
@@ -33,6 +33,7 @@ def plot_scatter(success_matrix):
     plt.scatter([], [], color='green', label=f'Acierto')
     plt.scatter([], [], color='red', marker='x', label='Fallo')
     plt.legend()
+    plt.savefig(f'coh_sim_relation_{name}')
     plt.show()
 
 

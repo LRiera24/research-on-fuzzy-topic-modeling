@@ -9,6 +9,7 @@ import resource
 import json
 import time
 
+
 def semantic_classification(corpus, corpus_name, real_k, real_tags, test_folder, description=None, min_words_per_topic=20, min_sim=0.01, min_coh=0.5, wsd_algorithm='lesk'):
     if wsd_algorithm not in ["lesk", "simplex", "genetic"]:
         raise KeyError("WSD algorithm not found. Try: lesk, simplex, genetic")
@@ -28,53 +29,55 @@ def semantic_classification(corpus, corpus_name, real_k, real_tags, test_folder,
     preprocesser.preprocess_text(corpus, corpus_name)
 
     estimator = TopicNumberEstimation(word2vec_model)
-    k, clusters = estimator.estimate_topic_number(preprocesser.vocabulary, preprocesser.co_occurrence_dict, min_sim, min_coh, min_words_per_topic)
+    k, clusters = estimator.estimate_topic_number(
+        preprocesser.vocabulary, preprocesser.co_occurrence_dict, min_sim, min_coh, min_words_per_topic)
 
     print("Estimated number of topics:", k)
 
-    topic_finder = TopicDiscovery(preprocesser.vector_repr, preprocesser.dictionary, k)
-    topic_model = topic_finder.train_lda()
-    topics = topic_finder.get_topics(topic_model)
-    print(topics)
+    # topic_finder = TopicDiscovery(preprocesser.vector_repr, preprocesser.dictionary, k)
+    # topic_model = topic_finder.train_lda()
+    # topics = topic_finder.get_topics(topic_model)
+    # print(topics)
 
-    tagger = TopicNaming(topic_model, information_content_corpus, word2vec_model)
-    tagger.tag_topics()
-    top_words = tagger.top_words
-    print("Chosen defs:", tagger.chosen_defs)
-    chosen_defs = []
-    for defn in tagger.chosen_defs:
-        chosen_defs.append([d.name() for d in defn])
-    print("Tags:", tagger.domains)
-    tags = []
-    for _, dom in tagger.domains:
-        print('dom', dom)        
-        tags.append([t.name() for t in dom[0]])
-    
+    # tagger = TopicNaming(topic_model, information_content_corpus, word2vec_model)
+    # tagger.tag_topics()
+    # top_words = tagger.top_words
+    # print("Chosen defs:", tagger.chosen_defs)
+    # chosen_defs = []
+    # for defn in tagger.chosen_defs:
+    #     chosen_defs.append([d.name() for d in defn])
+    # print("Tags:", tagger.domains)
+    # tags = []
+    # for _, dom in tagger.domains:
+    #     print('dom', dom)
+    #     tags.append([t.name() for t in dom[0]])
 
     end_time = time.time()
     end_memory = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
 
     execution_time = end_time - start_time
-    memory_usage = end_memory - start_memory   
+    memory_usage = end_memory - start_memory
 
-    test_data = {"corpus_name" : corpus_name, 
-                "real_k" : real_k, 
-                "real_tags" : real_tags, 
-                "memory_usage" : memory_usage, 
-                "execution_time" : execution_time, 
-                "estimated_k" : k, 
-                "parameters" : {"min_words_per_topic" : min_words_per_topic, 
-                                "min_sim" : min_sim, 
-                                "min_coh" : min_coh, 
-                                "wsd_algorithm" : wsd_algorithm},
-                "clusters" : clusters, 
-                "topics" : topics, 
-                "top_words" : top_words,
-                "chosen_defs" : chosen_defs,
-                "estimated_tags" : tags
-                } 
+    test_data = {"corpus_name": corpus_name,
+                 "real_k": real_k,
+                 "real_tags": real_tags,
+                 "memory_usage": memory_usage,
+                 "execution_time": execution_time,
+                 "words_tfidf": preprocesser.words_tfidf,
+                 "estimated_k": k,
+                 "parameters": {"min_words_per_topic": min_words_per_topic,
+                                "min_sim": min_sim,
+                                "min_coh": min_coh,
+                                "wsd_algorithm": wsd_algorithm},
+                 "clusters": clusters
+                 # "topics" : topics,
+                 # "top_words" : top_words,
+                 # "chosen_defs" : chosen_defs,
+                 # "estimated_tags" : tags
+                 }
 
-    file_count = len([name for name in os.listdir(test_folder) if os.path.isfile(os.path.join(test_folder, name))])
+    file_count = len([name for name in os.listdir(test_folder)
+                     if os.path.isfile(os.path.join(test_folder, name))])
 
     # Filename for the test to be saved
     file_name = f"test_{file_count + 1}.json"

@@ -18,10 +18,10 @@ corpus_name = '20newsgroups'
 
 real_k = 20
 
-real_tags = []
+real_tags = newsgroups.target_names
 
-description = 'individual'
-min_words_per_topic = 1000
+description = 'fase1'
+min_words_per_topic = 100
 
 test_folder = os.path.abspath('tests')
 test_folder += f'/{corpus_name}'
@@ -46,8 +46,8 @@ os.makedirs(test_folder)
 s = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 c = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 
-# for sim in s:
-#     for coh in c:
-#         semantic_classification(corpus, corpus_name, real_k, real_tags, min_sim=sim, min_coh=coh, min_words_per_topic=100)
+for sim in s:
+    for coh in c:
+        semantic_classification(corpus, corpus_name, real_k, real_tags, test_folder=test_folder, min_sim=sim, min_coh=coh, min_words_per_topic=min_words_per_topic)
 
-semantic_classification(corpus, corpus_name, real_k, real_tags, test_folder=test_folder, min_sim=0.4, min_coh=0.9, min_words_per_topic=20)
+# semantic_classification(corpus, corpus_name, real_k, real_tags, test_folder=test_folder, min_sim=0.4, min_coh=0.9, min_words_per_topic=20)

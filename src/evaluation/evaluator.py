@@ -39,7 +39,7 @@ def experiment3(processed_jsons):
     pass
 
 test_folder = os.path.abspath('tests')
-test_folder += f'/20newsgroups/run29_1000_individual'
+test_folder += f'/Reuters/run3_500_fase1'
 
 processed_jsons = []
 processed_jsons.append((process_jsons(test_folder, 13, 5)))

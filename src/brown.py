@@ -20,13 +20,13 @@ corpus_name = 'Brown'
 
 real_k = 15
 
-real_tags = []
+real_tags = brown.categories()
 
 s = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 c = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 
-description = None
-min_words_per_topic = 1000
+description = 'fase1'
+min_words_per_topic = 500
 
 test_folder = os.path.abspath('tests')
 test_folder += f'/{corpus_name}'

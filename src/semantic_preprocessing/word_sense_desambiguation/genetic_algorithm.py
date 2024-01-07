@@ -1,11 +1,11 @@
 import random
+# from semantic_preprocessing.word_sense_desambiguation.avg_distance import calculate_mean_similarity
 from semantic_preprocessing.word_sense_desambiguation.avg_distance import calculate_mean_similarity
 from math import inf
 from nltk.corpus import wordnet
 
 SYNSET = 0
 FITNESS = 1
-
 
 def init_population(context_synsets, pop_size):
     """
@@ -98,12 +98,29 @@ def evaluate(synsets_masks, synsets):
     - float: The mean similarity between the selected synsets.
     """
     chosen_synsets = []
-
     for i, mask in enumerate(synsets_masks):
         chosen_synsets.extend([synsets[i][j]
-                              for j in range(len(mask)) if mask[j] > 0])
+                              for j in range(len(mask)) if mask[j] > 0 if synsets[i][j].pos() != 'v'])
+    print(chosen_synsets)
+    if len(chosen_synsets) != len(synsets_masks):
+        return -1
 
-    return calculate_mean_similarity(chosen_synsets)
+    calculated_distances = []
+    sim = 0
+    c = 0
+    for synset1 in chosen_synsets:
+        for synset2 in chosen_synsets:
+            if synset1 == synset2 or (synset1, synset2) in calculated_distances or (synset2, synset1) in calculated_distances or synset1.pos() == 'v' or synset2.pos() == 'v':
+                continue
+            calculated_distances.append((synset1, synset2))
+            sim += synset1.path_similarity(synset2)
+            c += 1
+    if c > 0:
+        sim = sim / c
+    else: 
+        sim = -1
+    print('fitness', sim)
+    return sim
 
 
 def select_parents(population, fitness_values, selection_proportion=1):
@@ -212,25 +229,25 @@ def new_population(best_individuals, xover_ratio=0.6, mutation_ratio=0.4):
     return new_population
 
 
-def genetic_algorithm(synsets, generations=10, pop_size=5):
+def genetic_algorithm(synsets, generations=100, pop_size=50):
     population = init_population(synsets, pop_size)
     # print(len(population))
     # for individual in population:
     #     print(individual)
 
     # best solution found
-    best_solution = ([], inf)  # (solution, fitness value)
+    best_solution = ([], -inf)  # (solution, fitness value)
 
     for _ in range(generations):
         fitness_values = [evaluate(individual, synsets)
                           for individual in population]
 
         max_fitness = max(fitness_values)
-        if max_fitness < best_solution[FITNESS]:
-            print("!!!!!!!!! BETTER SOLUTION FOUND")
-            i = fitness_values.index(max_fitness)
-            print(i)
-            print(population[i])
+        if max_fitness > best_solution[FITNESS]:
+            # print("!!!!!!!!! BETTER SOLUTION FOUND")
+            # i = fitness_values.index(max_fitness)
+            # print(i)
+            # print(population[i])
             best_solution = (
                 population[fitness_values.index(max_fitness)], max_fitness)
 
@@ -242,7 +259,7 @@ def genetic_algorithm(synsets, generations=10, pop_size=5):
 
     chosen_synsets = []
     for index, synset_mask in enumerate(best_solution[SYNSET]):
-        print(synset_mask)
+        # print(synset_mask)
         d = synset_mask.index(1)
         chosen_synsets.append(synsets[index][d])
 
@@ -260,13 +277,3 @@ def genetic_algorithm(synsets, generations=10, pop_size=5):
 #     print(chosen[i], defs[i])
 
 # print(value)
-
-# print(mutate([[0, 0, 1, 0], [1, 0, 0, 0], [0, 0, 0, 1, 0], [1, 0, 0], [0, 1, 0], [1]]))
-
-# children = crossover([[0, 0, 1, 0], [1, 0, 0, 0], [0, 0, 0, 1, 0], [1, 0, 0], [0, 1, 0], [1]],
-#                      [[0, 0, 0, 1], [0, 1, 0, 0], [0, 1, 0, 0, 0], [0, 0, 1], [1, 0, 0], [1]])
-
-# for c in children:
-#     print(c)
-
-# 0.6875568004979768
