@@ -2,7 +2,7 @@ import os
 import json
 import numpy as np
 
-def process_jsons(folder_path, window_lower=5, window_upper=5):
+def process_jsons(folder_path, window_lower=5, window_upper=5, fase2=False):
     """
     Filters JSON files in the given folder based on whether the estimated_k is within a specified window compared to real_k,
     and also returns a boolean list and a 9x9 matrix indicating if each file's estimated_k falls within the range.
@@ -34,6 +34,9 @@ def process_jsons(folder_path, window_lower=5, window_upper=5):
                     sim = data.get('parameters')['min_sim']
                     print(sim)
 
+                    if fase2:
+                        filtered_jsons.append(data)
+                        
                     # Check if the estimated_k is within the specified window compared to real_k
                     if estimated_k is not None and real_k is not None:
                         difference = estimated_k - real_k
@@ -46,10 +49,10 @@ def process_jsons(folder_path, window_lower=5, window_upper=5):
     return filtered_jsons, matrix
 
 
-test_folder = os.path.abspath('tests')
-test_folder += f'/Reuters/run1_100'
+# test_folder = os.path.abspath('tests')
+# test_folder += f'/Reuters/run1_100'
 
-# Example usage
-filtered_data, flags_matrix = process_jsons(test_folder, window_lower=5, window_upper=5)
-print(flags_matrix)
+# # Example usage
+# filtered_data, flags_matrix = process_jsons(test_folder, window_lower=5, window_upper=5)
+# print(flags_matrix)
 

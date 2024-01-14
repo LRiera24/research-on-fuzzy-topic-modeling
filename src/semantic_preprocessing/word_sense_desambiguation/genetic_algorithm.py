@@ -101,9 +101,9 @@ def evaluate(synsets_masks, synsets):
     for i, mask in enumerate(synsets_masks):
         chosen_synsets.extend([synsets[i][j]
                               for j in range(len(mask)) if mask[j] > 0 if synsets[i][j].pos() != 'v'])
-    print(chosen_synsets)
-    if len(chosen_synsets) != len(synsets_masks):
-        return -1
+    # print(chosen_synsets)
+    # if len(chosen_synsets) != len(synsets_masks):
+    #     return -100
 
     calculated_distances = []
     sim = 0
@@ -119,7 +119,7 @@ def evaluate(synsets_masks, synsets):
         sim = sim / c
     else: 
         sim = -1
-    print('fitness', sim)
+    # print('fitness', sim)
     return sim
 
 
@@ -253,9 +253,9 @@ def genetic_algorithm(synsets, generations=100, pop_size=50):
 
         best_individuals = select_parents(population, fitness_values)
         population = new_population(best_individuals)
-        print("len(population)", len(population))
-        for individual in population:
-            print(individual)
+        # print("len(population)", len(population))
+        # for individual in population:
+        #     print(individual)
 
     chosen_synsets = []
     for index, synset_mask in enumerate(best_solution[SYNSET]):

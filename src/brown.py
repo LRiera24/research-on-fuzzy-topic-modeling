@@ -15,6 +15,9 @@ document_ids = brown.fileids()
 
 # Crear una lista de documentos, donde cada documento es un string
 corpus = [' '.join(brown.words(fileid)) for fileid in document_ids]
+doc_categories = [brown.categories(id) for id in brown.fileids()]
+print(len(corpus))
+print(doc_categories)
 
 corpus_name = 'Brown'
 
@@ -25,8 +28,8 @@ real_tags = brown.categories()
 s = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 c = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 
-description = 'fase1'
-min_words_per_topic = 500
+description = 'fase2_topic_correspondence'
+min_words_per_topic = 0
 
 test_folder = os.path.abspath('tests')
 test_folder += f'/{corpus_name}'
@@ -48,6 +51,8 @@ if description:
 
 os.makedirs(test_folder)
 
-for sim in s:
-    for coh in c:
-        semantic_classification(corpus, corpus_name, real_k, real_tags, test_folder, min_sim=sim, min_coh=coh, min_words_per_topic=min_words_per_topic)
+# for sim in s:
+#     for coh in c:
+#         semantic_classification(corpus, corpus_name, real_k, real_tags, test_folder, min_sim=sim, min_coh=coh, min_words_per_topic=min_words_per_topic)
+
+semantic_classification(corpus, doc_categories, corpus_name, real_k, real_tags, test_folder=test_folder, min_sim=0.0, min_coh=0.0, min_words_per_topic=0)

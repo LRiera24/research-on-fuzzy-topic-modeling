@@ -36,11 +36,12 @@ def load_reuters_corpus(directory):
     return documents, topics
 
 corpus, real_tags = load_reuters_corpus(os.path.abspath('src') + '/corpus/reuters21578')
+categories = [['gib'] for _ in range(len(corpus))]
 corpus_name = 'Reuters'
 real_k = 135
 
-description = 'fase1'
-min_words_per_topic = 50
+description = 'fase2_wsd_lesk'
+min_words_per_topic = 0
 
 test_folder = os.path.abspath('tests')
 test_folder += f'/{corpus_name}'
@@ -62,9 +63,11 @@ if description:
 
 os.makedirs(test_folder)
 
-s = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
-c = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+# s = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+# c = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 
-for sim in s:
-    for coh in c:
-        semantic_classification(corpus, corpus_name, real_k, real_tags, test_folder=test_folder, min_sim=sim, min_coh=coh, min_words_per_topic=min_words_per_topic)
+# for sim in s:
+#     for coh in c:
+#         semantic_classification(corpus, corpus_name, real_k, real_tags, test_folder=test_folder, min_sim=sim, min_coh=coh, min_words_per_topic=min_words_per_topic)
+
+semantic_classification(corpus, categories, corpus_name, real_k, real_tags, test_folder=test_folder, min_sim=0.0, min_coh=0.0, min_words_per_topic=0)

@@ -95,9 +95,11 @@ def simplex_sol(synsets):
 # context = ['egg', 'sugar', 'butter', 'flour', 'recipe', 'cake', 'dessert']
 # context = ['birthday', 'party', 'gift', 'music', 'candles', 'wish']
 # context = ['computer', 'program', 'development', 'web', 'application', 'data']
-# context = ['school', 'class', 'homework', 'student', 'book', 'knowledge', 'learn', 'teach']
+# context = ['school', 'class', 'homework', 'student', 'book', 'knowledge', 'learn', 'teach', 'library', 'computer']
 
-# synsets = [wordnet.synsets(word) for word in context]
+# context = ['people', 'game', 'year', 'time', 'know', 'thing', 'day', 'point']
+# synsets = [wordnet.synsets(word) for word in context if wordnet.synsets(word)]
+# print(synsets)
 # r = simplex_sol(synsets)
 # print(r)
 

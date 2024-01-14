@@ -3,7 +3,9 @@ import numpy as np
 from semantic_preprocessing.word_sense_desambiguation.genetic_algorithm import genetic_algorithm
 from semantic_preprocessing.word_sense_desambiguation.simplex import simplex_sol
 from semantic_preprocessing.word_sense_desambiguation.lesk_modified import lesk_embedding
+from semantic_preprocessing.word_sense_desambiguation.avg_distance import calculate_mean_similarity
 import nltk
+
 
 class TopicNaming:
     """
@@ -34,6 +36,7 @@ class TopicNaming:
         self.embeddings_model = embeddings_model
         self.domains = []
         self.chosen_defs = []
+        self.syn_similarities = []
         self.top_words = []
 
     def tag_topics(self):
@@ -41,12 +44,14 @@ class TopicNaming:
         Assigns a name to each topic based on the lowest common domain among its top words.
         """
         for topic_num in range(self.topic_model.num_topics):
-            top_words = self.get_top_words(topic_num, 30)
+            # if topic_num <= 20:
+            top_words = self.get_top_words(topic_num, 100)
             self.top_words.append(top_words)
-            synsets = self.get_definitions_for_context(top_words)
+            synsets, value = self.get_definitions_for_context(top_words)
             self.chosen_defs.append(synsets)
+            self.syn_similarities.append(value)
             doms = (topic_num, self.calculate_max_weighted_score(synsets))
-            print("Chosen tags:", doms)
+            # print("Chosen tags:", doms)
             self.domains.append(doms)
 
     def get_top_words(self, topic_num, k):
@@ -71,7 +76,8 @@ class TopicNaming:
         tagged_words = nltk.pos_tag(words)
 
         # Filter out verbs (tags starting with 'VB')
-        non_verb_words = [word for word, tag in tagged_words if tag.startswith('NN')]
+        non_verb_words = [word for word,
+                          tag in tagged_words if tag.startswith('NN')]
 
         # Select the first k non-verb words
         top_words = non_verb_words[:k]
@@ -94,7 +100,7 @@ class TopicNaming:
     #     topic_words = sorted(topic_words, key=lambda x: x[1], reverse=True)
 
     #     # Calculate the rate of change in probability
-    #     probability_changes = [topic_words[i][1] - topic_words[i + 1][1] 
+    #     probability_changes = [topic_words[i][1] - topic_words[i + 1][1]
     #                            for i in range(len(topic_words) - 1)]
 
     #     # Calculate the average and standard deviation of these changes
@@ -123,18 +129,32 @@ class TopicNaming:
         Returns:
             list: A list of chosen synsets for the given context.
         """
+        print(len(context))
+        # synsets = []
+        # for word in context:
+        #     syns = wordnet.synsets(word)
+        #     if syns:
+        #         synsets.append(syns)
+        #     else:
+        #         context.remove(word)
+        # synsets = [wordnet.synsets(word) for word in context if wordnet.synsets(word)]
         synsets = [wordnet.synsets(word) for word in context]
         chosen_synsets = []
+        value = 0
         if algorithm == 'simplex':
-            chosen_synsets = simplex_sol(synsets)
+            chosen_synsets, value = simplex_sol(synsets)
         elif algorithm == 'genetic':
-            chosen_synsets = genetic_algorithm(synsets)
+            chosen_synsets, value = genetic_algorithm(synsets)
         elif algorithm == 'lesk':
             for i, word in enumerate(context):
-                best_synset = lesk_embedding(word, context, self.embeddings_model, synsets[i])
+                best_synset = lesk_embedding(
+                    word, context, self.embeddings_model, synsets[i])
                 if best_synset:
                     chosen_synsets.append(best_synset)
-        return chosen_synsets
+            value = calculate_mean_similarity(chosen_synsets)
+
+        print(len(chosen_synsets))
+        return chosen_synsets, value
 
     def calculate_max_weighted_score(self, context_synsets):
         """
@@ -148,24 +168,28 @@ class TopicNaming:
         """
         candidate_tags = {}
         MAX_OCCURRENCE = 0
-        hyper = lambda s: s.hypernyms()
+        def hyper(s): return s.hypernyms()
         for s in context_synsets:
             for w in list(s.closure(hyper)):
                 if w.min_depth() >= 4:
                     candidate_tags[w] = candidate_tags.get(w, 0) + 1
                     MAX_OCCURRENCE = max(MAX_OCCURRENCE, candidate_tags[w])
+        # return [s for index, s in enumerate(candidate_tags.keys()) if candidate_tags[s] == MAX_OCCURRENCE], 0
 
         combined_weights = []
         for synset in candidate_tags.keys():
-            information_content = self.information_content_corpus.get(synset.name(), 0.0)
+            information_content = self.information_content_corpus.get(
+                synset.name(), 0.0)
             specificity_weight = synset.min_depth()
-            semantic_relevance_weight = self.calculate_semantic_relevance(synset, context_synsets)
+            semantic_relevance_weight = self.calculate_semantic_relevance(
+                synset, context_synsets)
             frequency_weight = candidate_tags[synset]
             combined_weights.append(
-            np.mean([0.25 * information_content, 0.15 * specificity_weight, 0.5 * semantic_relevance_weight, 0.1 * frequency_weight]))
+                np.mean([0.4 * information_content, 0.6 * semantic_relevance_weight]))
 
         max_value = max(combined_weights)
-        max_indices = [i for i, x in enumerate(combined_weights) if max_value - x <= 0.001]
+        max_indices = [i for i, x in enumerate(
+            combined_weights) if max_value - x <= 0.001]
 
         return [s for index, s in enumerate(candidate_tags.keys()) if index in max_indices], round(max_value, 2)
 
@@ -182,7 +206,8 @@ class TopicNaming:
         """
         semantic_relevance = 0
         for s in context_synsets:
-            s1, s2 = s.lemma_names()[0].split('_')[0], synset.lemma_names()[0].split('_')[0]
+            s1, s2 = s.lemma_names()[0].split(
+                '_')[0], synset.lemma_names()[0].split('_')[0]
             try:
                 relevance = np.dot(self.embeddings_model[s1], self.embeddings_model[s2]) / (
                     np.linalg.norm(self.embeddings_model[s1]) * np.linalg.norm(self.embeddings_model[s2]))

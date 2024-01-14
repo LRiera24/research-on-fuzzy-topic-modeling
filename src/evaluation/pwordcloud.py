@@ -26,13 +26,6 @@ def rgb_to_hex(rgb):
     return '#{:02x}{:02x}{:02x}'.format(*rgb)
 
 def plot_wordclouds(list_of_word_sets, tfidf_scores, img_name, tags=None, use_frequency=True):
-    num_word_sets = len(list_of_word_sets)
-    num_columns = min(4, int(num_word_sets / 2))
-    num_rows = -(-num_word_sets // num_columns)  # Ceiling division
-
-    fig = plt.figure(figsize=(20 + num_columns * 5, num_rows * 15))
-    plt.suptitle(f'Identified number of topics in the corpus - {num_word_sets}', fontsize=20, y=0.96, weight='bold')
-
     for i, word_set in enumerate(list_of_word_sets, start=1):
         filtered_dict = {}
         for word in word_set:
@@ -46,21 +39,22 @@ def plot_wordclouds(list_of_word_sets, tfidf_scores, img_name, tags=None, use_fr
 
         wordcloud = None
         if use_frequency:
-            wordcloud = WordCloud(width=300, height=300, background_color='white', color_func=color_func).generate_from_frequencies(filtered_dict)
+            wordcloud = WordCloud(width=800, height=600, background_color='white', color_func=color_func).generate_from_frequencies(filtered_dict)
         else:
-            wordcloud = WordCloud(width=300, height=300, background_color='white', color_func=color_func).generate(text)
+            wordcloud = WordCloud(width=800, height=600, background_color='white', color_func=color_func).generate(text)
 
-        plt.subplot(num_rows, num_columns, i)
+        plt.figure(figsize=(8, 6))
         plt.imshow(wordcloud, interpolation='bilinear')
         plt.axis('off')
 
         if not tags:
-            plt.title(f'Topic {i}', y=-0.1)
+            plt.title(f'Topic {i}', fontsize=20)
         else:
-            plt.title(split_title(", ".join(tags[i-1])), fontsize=40, y=-0.1)
+            plt.title(split_title(", ".join(tags[i-1])), fontsize=20)
 
-    plt.tight_layout(pad=15.0, h_pad=15.0, w_pad=15.0, rect=[0, 0.03, 1, 0.95])
-    plt.savefig(f'wordcloud_{img_name}.png')
+        plt.tight_layout()
+        plt.savefig(f'individual_wordcloud_{img_name}_topic_{i}.png', bbox_inches='tight', pad_inches=0.1)
+        plt.close()
 
 # example_sets_of_words = [
 #     ["python", "programming", "code", "scripting", "automation"],

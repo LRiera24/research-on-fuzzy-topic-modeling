@@ -25,8 +25,12 @@ def lesk_embedding(word, context, model, synsets=None):
     if not synsets:
         return None
 
+    important_terms = []
     # Extract important terms using TF-IDF
-    important_terms = extract_important_terms([synset.definition() for synset in synsets])
+    try:
+        important_terms = extract_important_terms([synset.definition() for synset in synsets])
+    except:
+        return None
     # print(important_terms)
 
     context_embedding = np.mean([model[word] for word in context if word in model], axis=0)

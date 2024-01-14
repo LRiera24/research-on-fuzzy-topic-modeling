@@ -227,16 +227,16 @@ def genetic_algorithm(synsets, generations=10, pop_size=5):
 
         max_fitness = max(fitness_values)
         if max_fitness < best_solution[FITNESS]:
-            print("!!!!!!!!! BETTER SOLUTION FOUND")
+            # print("!!!!!!!!! BETTER SOLUTION FOUND")
             i = fitness_values.index(max_fitness)
-            print(i)
-            print(population[i])
+            # print(i)
+            # print(population[i])
             best_solution = (
                 population[fitness_values.index(max_fitness)], max_fitness)
 
         best_individuals = select_parents(population, fitness_values)
         population = new_population(best_individuals)
-        print("len(population)", len(population))
+        # print("len(population)", len(population))
         for individual in population:
             print(individual)
 
