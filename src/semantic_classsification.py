@@ -34,7 +34,7 @@ def semantic_classification(corpus, categories, corpus_name, real_k, real_tags, 
 
     # print("Estimated number of topics:", k)
 
-    k = 135
+    k = 15
     topic_finder = TopicDiscovery(
         preprocesser.vector_repr, preprocesser.dictionary, k)
     topic_model = topic_finder.train_lda()

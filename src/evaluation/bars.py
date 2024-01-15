@@ -44,24 +44,25 @@ def graficar_desempeno_wsd_combinado(resultados):
     plt.savefig('wsd_corpus')
 
     # Calcular la media de similitud semántica para cada algoritmo en todos los corpus para el segundo gráfico
-    media_valores = {}
-    for algoritmo in algoritmos_nombres:
-        media_valores[algoritmo] = np.mean([np.mean(resultados[corpus][algoritmo]) for corpus in resultados])
+    media_valores = {'Lesk Extendido': 484,
+                    'Algoritmo Genético': 18114}
+    # for algoritmo in algoritmos_nombres:
+    #     media_valores[algoritmo] = np.mean([np.mean(resultados[corpus][algoritmo]) for corpus in resultados])
 
     # Crear figura para el desempeño general
     fig2, ax2 = plt.subplots(figsize=(8, 6))
 
     # Crear barras para el segundo gráfico
-    ax2.bar(media_valores.keys(), media_valores.values(), color='cornflowerblue')
+    ax2.bar(media_valores.keys(), media_valores.values(), color='purple')
 
     # Añadir etiquetas y título al segundo gráfico
     ax2.set_xlabel('Algoritmo')
-    ax2.set_ylabel('Similitud Semántica Media General')
+    ax2.set_ylabel('Tiempo de Ejecución Promedio (s)')
     ax2.set_title('Desempeño General de los Algoritmos WSD')
 
     # Ajustar layout y mostrar gráficos
     plt.tight_layout()
-    plt.savefig('wsd_general')
+    plt.savefig('execution_time_general')
     return fig1, fig2
 
 resultados = {
