@@ -2,7 +2,6 @@ from process_jsons import process_jsons
 from scatter import plot_scatter
 from heatmap import plot_heatmap
 from pwordcloud import plot_wordclouds
-from bars import plot_bar_chart
 import os
 import numpy as np
 

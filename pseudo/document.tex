@@ -1,0 +1,201 @@
+\documentclass{article}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage[spanish]{babel}
+
+\makeatletter
+\renewcommand{\ALG@name}{\small Algoritmo}
+\makeatother
+
+\begin{document}
+	
+	\title{Pseudocode for AutoIncrementalClustering}
+	\author{}
+	\date{}
+	\maketitle
+	
+	\section*{Pseudocode}
+		\begin{algorithm}
+		\caption{\small AgrupamientoAutoIncremental}
+		\begin{algorithmic}[1]
+			\scriptsize
+			\Require \textit{vocabulario}: Vocabulario del corpus, \textit{matriz-coocurrencia}: Matriz de coocurrencia del corpus, \textit{word\_embeddings}: \textit{Word embeddings} de las palabras del vocabulario, \textit{min\_sim}: Umbral de similitud m\'inima intra-cl\'uster, \textit{min\_coh}: Umbral de coherencia m\'inima intra-cl\'uster.
+			\Ensure Grupos de palabras sem\'anticamente similares del vocabulario.
+%			\State \textbf{init:} \textit{vocabulario: vocabulario del corpus,} 
+%			\State \hspace{\algorithmicindent} \textit{matriz-coocurrencia: matriz de coocurrencia del corpus, }
+%			\State \hspace{\algorithmicindent} \textit{word\_embeddings: word embeddings de las palabras del vocabulario,} 
+%			\State \hspace{\algorithmicindent} \textit{min\_similarity: umbral de similitud m\'inima intra cl\'uster,} 
+%			\State \hspace{\algorithmicindent} \textit{min\_coherence: umbral de coherencia m\'inima intra cl\'uster,}
+%			\State \hspace{\algorithmicindent} \textit{grupos: lista de grupos (centroide, word\_embeddings, palabras)}
+			\Function{Auto\_Incremental Clustering}{vocabulario, matriz\_coocurrencia, word\_embeddings, min\_sim, min\_coh}
+			\State $grupos \gets \{\}$ \Comment{Lista de grupos de la forma (centroide, word\_embeddings, palabras)}.
+			\For{cada \textit{word embedding} $w_e$ de las palabras del vocabulario}
+			\If{no existen grupos}
+			\State crear primer grupo con $w_e$
+			\Else
+			\State $grupos\_similares$ $\gets \{ C \mid C \text{ en \textit{grupos} \textbf{and} } sim(w_e, C) \geq min\_sim \}$
+			\State $grupos\_coherentes$ $\gets \{ C \mid C \text{ en $grupos\_similares$ \textbf{and} } coh(w, \{w_C\}) \geq min\_coh\}$
+			
+			\If{no existen grupos coherentes para $w$}
+			\State crear un nuevo grupo para $w$
+			\Else
+			\State a\~nadir $w_e$ a los grupos coherentes
+			\State actualizar centroides de los grupos modificados
+			\EndIf
+			\EndIf
+			\EndFor
+			
+			\Return $C$
+			\EndFunction
+		\end{algorithmic}
+	\end{algorithm}
+
+%	\begin{algorithm}
+%		\caption{AutoIncrementalClustering}
+%		\begin{algorithmic}[1]
+%			\small
+%			\State \textbf{init:} \textit{words: vocabulary of the corpus,} 
+%			\State \hspace{\algorithmicindent} \textit{co-occurrence-matrix: co-occurrence-matrix of the corpus, }
+%			\State \hspace{\algorithmicindent} \textit{word\_embeddings: word embeddings of the words in the vocabulary,} 
+%			\State \hspace{\algorithmicindent} \textit{min\_similarity: minimum similarity threshold,} 
+%			\State \hspace{\algorithmicindent} \textit{min\_coherence: minimum coherence threshold,}
+%			\State \hspace{\algorithmicindent} \textit{clusters: set of clusters (centroid, word\_embeddings, words)}
+%			\\
+%			\For{each word embedding $w_e$ in $word\_embeddings$}
+%			\If{there are no clusters}
+%			\State create first cluster with $w_e$
+%			\Else
+%			\State $similarities$ $\gets \{ C \mid C \text{ in clusters and } sim(w_e, C) \geq min\_similarity \}$
+%			\State $coherences$ $\gets \{ C \mid C \text{ in clusters and } coh(w, \{w_C\}) \geq min\_coherence \}$
+%			
+%			\If{there are no coherent clusters for the word}
+%			\State Create a new cluster with it
+%			\Else
+%			\State Add $w_e$ to coherent clusters and update centroids of each one
+%			\EndIf
+%			\EndIf
+%			\EndFor
+%			
+%			\Return $C$
+%		\end{algorithmic}
+%	\end{algorithm}
+	
+	\begin{algorithm}
+		\caption{PalabrasRepresentativasTópico}
+		\begin{algorithmic}[1]
+			\scriptsize
+			\Require \textit{t\'opico}: Número del tópico, $k$: Número inicial de palabras principales a recuperar
+			\Ensure Lista de las palabras más relevantes para el tópico especificado
+			
+			\Function{obtener\_palabras\_principales}{$topico, k$}
+			\State $palabras\_del\_topico \gets$ Obtener las $k$ palabras más probables para el tópico, que sean sustantivos, y sus probabilidades
+			\State Ordenar $palabras\_del\_topico$ en orden descendente por probabilidad
+			\State $cambios\_de\_probabilidad \gets$ Calcular cambios en la probabilidad entre palabras consecutivas
+			\State $cambio\_promedio \gets$ Calcular el promedio de $cambios\_de\_probabilidad$
+			\State $desviacion\_estandar \gets$ Calcular la desviación estándar de $cambios\_de\_probabilidad$
+			\State $indice\_caida\_significativa \gets$ Encontrar el primer índice donde el cambio es mayor que $cambio\_promedio + desviacion\_estandar$
+			\State $palabras\_filtradas \gets$ Filtrar las palabras hasta el punto de caída significativa
+			\State \Return $palabras\_filtradas$
+			\EndFunction
+		\end{algorithmic}
+	\end{algorithm}
+	
+	
+	
+	\begin{algorithm}
+		\caption{LeskExtendido}
+		\begin{algorithmic}[1]
+			\scriptsize
+			\Require $palabra$: La palabra a desambiguar, $contexto$: Contexto de la palabra, $synsets$: Lista de $synsets$ de la palabra objetivo. $modelo$: Modelo pre-entrenado de \textit{word embeddings}.
+			\Ensure \textit{Synset} que mejor se ajusta al contexto.
+			
+			\Function{Extended\_Lesk}{palabra, contexto, synsets, modelo}
+			\State $context\_embedding \gets$ media aritm\'etica de los \textit{word embeddings} de las palabras del contexto.
+			
+			\For{cada $synset$ de la palabra objetivo}
+			\If{el \textit{synset} no es un verbo}
+			\State $definition\_embedding \gets$ media aritm\'etica de las palabras que conforman la definici\'on del $synset$.
+			\State $similitud \gets sim(context\_embedding, definition\_embedding)$
+			\If{$similitud > maxima\_similitud$}
+			\State $maxima\_similitud \gets similitud$
+			\State $mejor\_synset \gets synset$
+			\EndIf
+			\EndIf
+			\EndFor
+			
+			\Return $mejor\_synset$
+			\EndFunction
+		\end{algorithmic}
+	\end{algorithm}
+	
+	\begin{algorithm}
+		\caption{AlgoritmoGenéticoWSD}
+		\begin{algorithmic}[1]
+			\scriptsize
+			\Require $synsets$: Conjunto de synsets, $generaciones$: Número de generaciones, \textit{tama\~no\_pob}: Tamaño de la población.
+			\Ensure Conjunto de $synsets$ elegidos y su valor de fitness.
+			
+			\Function{genetic\_algorithm}{$synsets, generaciones,$ \textit{tama\~no\_pob}}
+			\State \textit{poblaci\'on} $\gets$ \Call{init\_population}{$synsets$, tama\~no\_pob}
+			\State \textit{mejor\_soluci\'on} $\gets ([], -\infty)$  \Comment{Inicializar la mejor solución encontrada}
+			\For{cada generaci\'on}
+			\For{cada individuo de la poblaci\'on}
+				\State \textit{fitness} $\gets$ \Call{evaluate}{individuo} 
+				\If{fitness $>$ \textit{mejor\_soluci\'on}[\textit{fitness}]}
+				\State \textit{mejor\_soluci\'on} $\gets$ (individuo, fitness)
+				\EndIf
+			\EndFor
+			\State $mejores\_individuos \gets$ \Call{select\_parents}{\textit{poblaci\'on}, $valores\_fitness$}
+			\State \textit{poblaci\'on} $\gets$ \Call{new\_population}{$mejores\_individuos$}
+			\EndFor
+			\State \Return $mejor\_solucion$
+			\EndFunction
+			
+			\Function{evaluate}{$synsets$}
+			\State Calcular la similitud media entre los $synsets$ seleccionados utilizando la medida de similitud seg\'un el camino (path) que ofrece wordnet
+			\State Las combinaciones que contengan alg\'un synset que act\'ue como verbo ser\'an penalizadas.
+			\State \Return Valor de similitud media
+			\EndFunction
+			
+			\Function{init\_population}{$context\_synsets$, tama\~no\_pob}
+			\State Inicializar \textit{poblaci\'on} como lista vacía
+			\For{cada iteración hasta \textit{tama\~no\_pob}}
+			\State Crear $individuo$ como una lista de listas binarias, donde cada lista representa los synsets de una palabra. Asigna un `1' en una posición aleatoria de cada lista, correspondiendo al synset activo de la palabra que representa.
+			\State Añadir $individuo$ a \textit{poblaci\'on}
+			\EndFor
+			\State \Return \textit{poblaci\'on}
+			\EndFunction
+			
+			\Function{select\_parents}{\textit{poblaci\'on}$, valores_fitness, selection\_proportion$}
+			\State Seleccionar los mejores individuos como padres usando selección por ruleta
+			\State \Return Lista de los mejores padres
+			\EndFunction
+			
+			\Function{new\_population}{$mejores\_individuos,$ \textit{raz\'on\_cruce, raz\'on\_mutaci\'on}}
+			\State Generar una nueva población usando operaciones de cruce y mutación
+			\State \Return Nueva población
+			\EndFunction
+			
+			\Function{crossover}{$padre\_1, padre\_2$}
+			\State Seleccionar un punto de cruce aleatorio
+			\State Crear dos hijos intercambiando los conjuntos de $synsets$ en el punto de cruce
+			\State \Return Lista con ambos hijos
+			\EndFunction
+			
+			\Function{mutate}{$individuo$}
+			\State Seleccionar un número aleatorio de conjuntos de $synsets$ para mutar
+			\For{cada conjunto seleccionado}
+			\State Cambiar el $synset$ activo por otro aleatorio
+			\EndFor
+			\State \Return $individuo$ mutado
+			\EndFunction
+			
+		\end{algorithmic}
+	\end{algorithm}
+	
+	
+	
+	
+\end{document}

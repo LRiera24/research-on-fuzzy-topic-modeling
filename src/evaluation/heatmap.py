@@ -37,8 +37,8 @@ def plot_heatmap(test_results, interpolation_factor=10):
     ax.set_xticklabels([i/10 for i in range(1, 10)])
     ax.set_yticklabels([round(1 - i/10, 1) for i in range(1, 10)])
 
-    plt.xlabel('Valores de Similitud')
-    plt.ylabel('Valores de Coherencia')
-    plt.title('Mapa de Calor de Frecuencia de Aciertos Promedio')
+    plt.xlabel('Similariry Values')
+    plt.ylabel('Coherence Values')
+    plt.title('Heatmap of average hit frequency')
     plt.savefig('heatmap', bbox_inches='tight', pad_inches=0.2)
     plt.show()

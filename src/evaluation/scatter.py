@@ -26,14 +26,14 @@ def plot_scatter(success_matrix, data, name=''):
             else:
                 plt.scatter(coherence, similarity, color='red', marker='x', s=150)
 
-    plt.xlabel('Coherencia', fontsize=15)
-    plt.ylabel('Similitud', fontsize=15)
+    plt.xlabel('Coherence', fontsize=15)
+    plt.ylabel('Similarity', fontsize=15)
     # plt.title(
     #     f'Relación entre Coherencia y Similitud en la Identificación de Tópicos: {matches} aciertos', fontsize=15)
 
     # Custom legend
-    plt.scatter([], [], color='green', label=f'Acierto')
-    plt.scatter([], [], color='red', marker='x', label='Fallo')
+    plt.scatter([], [], color='green', label=f'Hit')
+    plt.scatter([], [], color='red', marker='x', label='Miss')
     plt.legend()
     plt.savefig(f'coh_sim_relation_{name}', bbox_inches='tight', pad_inches=0.2)
     plt.show()
